@@ -66,4 +66,3 @@ mean(na.omit(Res[,1])); sd(na.omit(Res[,1])); mean(sqrt(Res[,2]))
 # results sie
 mean(na.omit(Res[,3])); sd(na.omit(Res[,3])); mean(sqrt(Res[,4]))
 
-save(Res, file="~/GitHub/NASH-mediation/Simulation study/Results/Res_n4000_M350")

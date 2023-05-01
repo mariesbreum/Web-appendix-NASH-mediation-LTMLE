@@ -28,9 +28,6 @@ simSimple <- function(n, # integer (sample size)
     Aprime <- a.prime
   }
   
-  muL <- rnorm(0.2, 0.1)
-  muM <- rnorm(-0.3, 0.1)
-  
   L0 <- rnorm(n, mean=10, sd = 5)
   M0 <- rnorm(n, mean=4, sd = 1)
   C1 <- rbinom(n, 1, 0.03)
