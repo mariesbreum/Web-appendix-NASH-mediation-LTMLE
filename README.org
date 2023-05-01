@@ -1,3 +1,0 @@
-#+TITLE: NASH mediation project
-
-This is a git repo to for the NASH mediation project.
