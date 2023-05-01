@@ -2,14 +2,18 @@
 # Run TMLE
 # -----------------------------------------------------------------------------
 #
+
+# libraries
+library(sl3)
+library(data.table)
+
+# load code
 setwd("~/GitHub/NASH-mediation/Simulation study")
 source("fcts-helper.R")
 source("fcts-initial.R")
 source("fcts-tmle.R")
 source("simulation-data-simple.R")
 
-library(sl3)
-library(data.table)
 # Set-up
 n <- 4000
 M <- 1000
@@ -44,7 +48,7 @@ fit <- fitLTMLE(data, t=c(1,2), L0nodes = c("L0", "M0"), Anode = "A", Cnodes = c
 # run sim
 set.seed(2345)
 res <- list()
-for(i in 1:M){
+for(i in 345:M){
   data <- simSimple(n)
   fit <- fitLTMLE(data, t=c(1,2), L0nodes = c("L0", "M0"), Anode = "A", Cnodes = c("C1", "C2"),
                   Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
@@ -62,3 +66,4 @@ mean(na.omit(Res[,1])); sd(na.omit(Res[,1])); mean(sqrt(Res[,2]))
 # results sie
 mean(na.omit(Res[,3])); sd(na.omit(Res[,3])); mean(sqrt(Res[,4]))
 
+save(Res, file="~/GitHub/NASH-mediation/Simulation study/Results/Res_n4000_M350")
