@@ -48,12 +48,12 @@ fit <- fitLTMLE(data, t=c(1,2), L0nodes = c("L0", "M0"), Anode = "A", Cnodes = c
 # run sim
 set.seed(2345)
 res <- list()
-for(i in 345:M){
+for(i in 1:M){
   data <- simSimple(n)
   fit <- fitLTMLE(data, t=c(1,2), L0nodes = c("L0", "M0"), Anode = "A", Cnodes = c("C1", "C2"),
                   Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
                   Cmodel, Mmodel, RYmodel, Ymodel, QLcov, 
-                  a = 1, a.prime = 0, n_bins = 50)
+                  a = 1, a.prime = 0, n_bins = 30)
   res[[i]] <- fit
   print(i)
 }
