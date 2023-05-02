@@ -82,7 +82,9 @@ fitLTMLE <- function(data, # data table or data frame
  nd.aprime <- copy(data)[, A:=rep(a.prime, n)]
  QY.a <- fitY$predict(make_prediction_task(nd.a[nd.a[[RYnode]]==1,], Ymodel))
  QY.aprime <- fitY$predict(make_prediction_task(nd.aprime[nd.aprime[[RYnode]]==1,], Ymodel))
-
+ QY.a <- pmin(upr, pmax(lwr, QY.a))
+ QY.aprime <- pmin(upr, pmax(lwr, QY.aprime))
+ 
  # target QY
  eps.a.ga <- coef(glm.fit(x=rep(1, nrow(data[data[[RYnode]]==1,])), y = data[data[[RYnode]]==1,][[Ynode]], 
                           weights = data[data[[RYnode]]==1,][[paste0("H.a.ga.", K+1)]], offset = qlogis(QY.a), 
@@ -112,22 +114,11 @@ fitLTMLE <- function(data, # data table or data frame
    nd.a.mk <- copy(nd.a)[,Mnodes[K]:=m_K_discrete[i]]
    nd.aprime.mk <- copy(nd.aprime)[,Mnodes[K]:=m_K_discrete[i]]
  
-   # initial predictions QY
+   # predict QY
    QY.a <- fitY$predict(make_task(nd.a.mk[nd.a.mk[[Cnodes[K]]]==0,], Ymodel))
    QY.aprime <- fitY$predict(make_task(nd.aprime.mk[nd.aprime.mk[[Cnodes[K]]]==0,], Ymodel))
-    
-   # target QY
-   eps.a.ga <- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K]]]==0,])), y = data[data[[Cnodes[K]]]==0,][[Ynode]], 
-                            weights = data[data[[Cnodes[K]]]==0,][[paste0("H.a.ga.", K+1)]], offset = qlogis(QY.a), 
-                            family = quasibinomial()))
-   
-   eps.a.gaprime <- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K]]]==0,])), y = data[data[[Cnodes[K]]]==0,][[Ynode]], 
-                                 weights = data[data[[Cnodes[K]]]==0,][[paste0("H.a.gaprime.", K+1)]], offset = qlogis(QY.a), 
-                                 family = quasibinomial()))
-   
-   eps.aprime.gaprime <- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K]]]==0,])), y = data[data[[Cnodes[K]]]==0,][[Ynode]], 
-                                      weights = data[data[[Cnodes[K]]]==0,][[paste0("H.aprime.gaprime.", K+1)]], offset = qlogis(QY.aprime), 
-                                      family = quasibinomial()))
+   QY.a <- pmin(upr, pmax(lwr, QY.a))
+   QY.aprime <- pmin(upr, pmax(lwr, QY.aprime))
    
    # predict g_a_K
    g.a <- fitg[[K]]$predict(make_task(nd.a.mk[nd.a.mk[[Cnodes[K]]]==0,], Mmodel[[K]]))
@@ -137,6 +128,11 @@ fitLTMLE <- function(data, # data table or data frame
    set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a.gaprime"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a.gaprime")]] + plogis(qlogis(QY.a) + eps.a.gaprime)*g.aprime*diff(m_K_discrete)[i])
    set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".aprime.gaprime"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".aprime.gaprime")]] + plogis(qlogis(QY.aprime) + eps.aprime.gaprime)*g.aprime*diff(m_K_discrete)[i])
  }
+ 
+ set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a.ga"), value =pmin(1, pmax(0,data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a.ga")]])))
+ set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a.gaprime"), value =pmin(1, pmax(0,data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a.gaprime")]])))
+ set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".aprime.gaprime"), value =pmin(1, pmax(0,data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".aprime.gaprime")]])))
+ 
 
  for(k in 1:(K-1)){
    
@@ -194,30 +190,16 @@ fitLTMLE <- function(data, # data table or data frame
      nd.a.mk <- copy(nd.a)[,Mnodes[K-k]:=m_k_discrete[i]]
      nd.aprime.mk <- copy(nd.aprime)[,Mnodes[K-k]:=m_k_discrete[i]]
      
-     # initial predictions QL_k+1
+     # predictions QL_k+1
      QL.a.ga <- fitL.a.ga$predict(make_task(nd.a.mk[nd.a.mk[[Cnodes[K-k]]]==0,], 
                                             paste0("QM_",K-k+1, ".a.ga", "~",QLcov[K-k+1])))
      QL.a.gaprime <- fitL.a.gaprime$predict(make_task(nd.a.mk[nd.a.mk[[Cnodes[K-k]]]==0,], 
                                                       paste0("QM_",K-k+1, ".a.gaprime", "~",QLcov[K-k+1])))
      QL.aprime.gaprime <- fitL.aprime.gaprime$predict(make_task(nd.aprime.mk[nd.aprime.mk[[Cnodes[K-k]]]==0,],
                                                                 paste0("QM_",K-k+1, ".aprime.gaprime", "~",QLcov[K-k+1])))
-     
      QL.a.ga <- pmin(upr, pmax(lwr, QL.a.ga))
      QL.a.gaprime <- pmin(upr, pmax(lwr, QL.a.gaprime))
      QL.aprime.gaprime <- pmin(upr, pmax(lwr, QL.aprime.gaprime))
-     
-     # target QL_k+1
-     eps.a.ga <- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K-k]]]==0,])), y = data[data[[Cnodes[K-k]]]==0,][[paste0("QM_",K-k+1, ".a.ga")]], 
-                              weights = data[data[[Cnodes[K-k]]]==0,][[paste0("H.a.ga.", K-k+1)]], offset = qlogis(QL.a.ga), 
-                              family = quasibinomial()))
-     
-     eps.a.gaprime<- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K-k]]]==0,])), y = data[data[[Cnodes[K-k]]]==0,][[paste0("QM_",K-k+1, ".a.gaprime")]], 
-                                  weights = data[data[[Cnodes[K-k]]]==0,][[paste0("H.a.gaprime.", K-k+1)]], offset = qlogis(QL.a.gaprime), 
-                                  family = quasibinomial()))
-     
-     eps.aprime.gaprime<- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K-k]]]==0,])), y = data[data[[Cnodes[K-k]]]==0,][[paste0("QM_",K-k+1, ".aprime.gaprime")]], 
-                                       weights = data[data[[Cnodes[K-k]]]==0,][[paste0("H.aprime.gaprime.", K-k+1)]], offset = qlogis(QL.aprime.gaprime), 
-                                       family = quasibinomial()))
      
      # predict g_a_k
      g.a <-fitg[[K-k]]$predict(make_task(nd.a.mk[nd.a.mk[[Cnodes[K-k]]]==0,], Mmodel[[K-k]]))
@@ -228,7 +210,10 @@ fitLTMLE <- function(data, # data table or data frame
      set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".aprime.gaprime"), value = data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".aprime.gaprime")]] + plogis(qlogis(QL.aprime.gaprime) + eps.aprime.gaprime)*g.aprime*diff(m_k_discrete)[i])
      
    }
-
+   set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".a.ga"), value = pmin(1, pmax(0,data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".a.ga")]])))
+   set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".a.gaprime"), value = pmin(1, pmax(0,data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".a.gaprime")]])))
+   set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".aprime.gaprime"), value = pmin(1, pmax(0,data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".aprime.gaprime")]])))
+   
  }
  
  ### Compute QL_1_star ###
