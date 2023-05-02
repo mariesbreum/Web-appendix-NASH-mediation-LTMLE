@@ -26,8 +26,8 @@ fitLTMLE <- function(data, # data table or data frame
                      Mlearner = NULL,
                      QLlearner = NULL,
                      Clearner = NULL,
-                     lwr = 0.0001,
-                     upr = 0.9999
+                     lwr = 1e-09,
+                     upr = 1-1e-09
                      
 ){
  data.table::setDT(data)
@@ -137,10 +137,7 @@ fitLTMLE <- function(data, # data table or data frame
    set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a.gaprime"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a.gaprime")]] + plogis(qlogis(QY.a) + eps.a.gaprime)*g.aprime*diff(m_K_discrete)[i])
    set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".aprime.gaprime"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".aprime.gaprime")]] + plogis(qlogis(QY.aprime) + eps.aprime.gaprime)*g.aprime*diff(m_K_discrete)[i])
  }
- data[, paste0("QM_", K, ".a.ga") := pmin(upr, pmax(lwr, data[[paste0("QM_", K, ".a.ga")]]))]
- data[, paste0("QM_", K, ".a.gaprime") := pmin(upr, pmax(lwr, data[[paste0("QM_", K, ".a.gaprime")]]))]
- data[, paste0("QM_", K, ".aprime.gaprime") := pmin(upr, pmax(lwr, data[[paste0("QM_", K, ".aprime.gaprime")]]))]
- 
+
  for(k in 1:(K-1)){
    
    ### Compute QL_k+1_star ###
@@ -232,10 +229,6 @@ fitLTMLE <- function(data, # data table or data frame
      
    }
 
-   data[, paste0("QM_", K-k, ".a.ga") := pmin(pmax(lwr, data[[paste0("QM_", K-k, ".a.ga")]]), upr)]
-   data[, paste0("QM_", K-k, ".a.gaprime") := pmin(pmax(lwr, data[[paste0("QM_", K, ".a.gaprime")]]), upr)]
-   data[, paste0("QM_", K-k, ".aprime.gaprime") := pmin(pmax(lwr, data[[paste0("QM_", K-k, ".aprime.gaprime")]]), upr)]
-   
  }
  
  ### Compute QL_1_star ###
@@ -297,8 +290,4 @@ fitLTMLE <- function(data, # data table or data frame
  class(out) <- "fitLTMLE"
  return(out)
 }  
-data <- simSimple(1000)
-fit <- fitLTMLE(data, t=c(1,2), L0nodes = c("L0", "M0"), Anode = "A", Cnodes = c("C1", "C2"),
-                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                Cmodel, Mmodel, RYmodel, Ymodel, QLcov, 
-                a = 1, a.prime = 0, n_bins = 30)  
+
