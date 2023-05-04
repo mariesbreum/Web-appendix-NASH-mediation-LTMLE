@@ -8,11 +8,11 @@ library(sl3)
 library(data.table)
 
 # load code
-setwd("~/GitHub/NASH-mediation/Simulation study")
-source("fcts-helper.R")
-source("fcts-initial.R")
-source("fcts-tmle.R")
-source("simulation-data-simple.R")
+setwd("~/GitHub/NASH-mediation")
+source("R/helper_fcts.R")
+source("R/fitInitial.R")
+source("R/fitLTMLE.R")
+source("functions/simulateData.R")
 
 # Set-up
 n <- 4000
@@ -44,8 +44,8 @@ fit <- fitLTMLE(data, t=c(1,2), L0nodes = c("L0", "M0"), Anode = "A", Cnodes = c
 # run sim
 set.seed(2345)
 res <- list()
-for(i in 1:M){
-  data <- simSimple(400)
+for(i in 46:M){
+  data <- simSimple(4000)
   fit <- fitLTMLE(data, t=c(1,2), L0nodes = c("L0", "M0"), Anode = "A", Cnodes = c("C1", "C2"),
                   Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
                   Cmodel, Mmodel, RYmodel, Ymodel, QLcov, a = 1, a.prime = 0, n_bins = 20)
@@ -53,13 +53,17 @@ for(i in 1:M){
   print(i)
 }
 
-Res <- matrix(unlist(res), ncol = 4, byrow = TRUE)
+Res <- matrix(unlist(res), ncol = 6, byrow = TRUE)
 
 # results sde
-mean(na.omit(Res[,1])); sd(na.omit(Res[,1])); mean(sqrt(Res[,2]))
-prop.table(table(0 > Res[,1] -1.96*sqrt(Res[,2]) & 0 < Res[,1] +1.96*sqrt(Res[,2])))
+mean(na.omit(Res[,1]))
+sd(Res[,1]); mean(sqrt(Res[,2])); mean(Res[, 5])
+prop.table(table(0 > Res[,1] - qnorm(0.975)*sqrt(Res[,2]) & 0 < Res[,1] + qnorm(0.975)*sqrt(Res[,2])))
+prop.table(table(0 > Res[,1] - qnorm(0.975)*Res[, 5] & 0 < Res[,1] + qnorm(0.975)*Res[, 5]))
 
 # results sie
-mean(na.omit(Res[,3])); sd(na.omit(Res[,3])); mean(sqrt(Res[,4]))
-prop.table(table(te.0 > Res[,3] -1.96*sqrt(Res[,4]) & te.0< Res[,3] +1.96*sqrt(Res[,4])))
+mean(na.omit(Res[,3]))
+sd(Res[,3]); mean(sqrt(Res[,4])); mean(Res[, 6])
+prop.table(table(te.0 > Res[,3] - qnorm(0.975)*sqrt(Res[,4]) & te.0 < Res[,3] + qnorm(0.975)*sqrt(Res[,4])))
+prop.table(table(te.0 > Res[,3] - qnorm(0.975)*Res[,6] & te.0 < Res[,3] + qnorm(0.975)*Res[,6]))
 

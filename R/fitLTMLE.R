@@ -271,8 +271,11 @@ fitLTMLE <- function(data, # data table or data frame
  sie <- data[data[[Cnodes[1]]]==0, mean(QL_1.a.ga.star)-mean(QL_1.a.gaprime.star)] 
  sdevar <- data[, var(na.omit(eif.a.gaprime - eif.aprime.gaprime)) / n]
  sievar <- data[, var(na.omit(eif.a.ga - eif.a.gaprime)) / n]
- out <- list("sde"=sde, "sdevar"=sdevar, "sie"=sie, "sievar"=sievar)
+ sdese <- data[, sqrt(mean(na.omit(eif.a.gaprime - eif.aprime.gaprime)^2) / n)]
+ siese <- data[, sqrt(mean(na.omit(eif.a.ga - eif.a.gaprime)^2) / n)]
+ out <- list("sde"=sde, "sdevar"=sdevar, "sie"=sie, "sievar"=sievar, "sdese"=sdese, "siese"=siese)
  class(out) <- "fitLTMLE"
  return(out)
 }  
+
 
