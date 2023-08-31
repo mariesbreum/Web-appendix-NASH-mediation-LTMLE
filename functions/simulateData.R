@@ -12,10 +12,10 @@ simulateData <- function(n, # integer (sample size)
                          betaM1.A=1.00, # numeric (reg coef for effect of A on M_1)
                          betaL2.A=1.00, # numeric (reg coef for effect of A on L_2)
                          betaM2.A=1.25, # numeric (reg coef for effect of A on M_2)
-                         betaY.A=0.50, # numeric (reg coef for effect of A on Y)
-                         betaY.M=0.30, # numeric (reg coef for effect of M_2 on Y)
-                         betaY.AL=0.1, # numeric (reg coef for effect of A M_2 interaction on Y)
-                         betaY.L=-0.1, # numeric (reg coef for effect of L_2  on Y)
+                         betaY.A=0.55, # numeric (reg coef for effect of A on Y)
+                         betaY.M=0.15, # numeric (reg coef for effect of M_2 on Y)
+                         betaY.AL=0.0, # numeric (reg coef for effect of A M_2 interaction on Y)
+                         betaY.L=-0.10, # numeric (reg coef for effect of L_2  on Y)
                          alphaY=-1, # numeric (intercept i Y model)
                          a=NULL, 
                          a.prime=NULL
@@ -51,4 +51,3 @@ simulateData <- function(n, # integer (sample size)
   
   return(dat)
 }
-

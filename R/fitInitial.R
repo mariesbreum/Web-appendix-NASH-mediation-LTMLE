@@ -65,12 +65,15 @@ fitInitial <- function(data,  # data table or data frame
   
   if(is.null(Mlearner)){
     for(k in 1:K){
+      mu.m <- predict(fitM[[k]])
       data[data[[Cnodes[k]]]==0, paste0("pM.", k) := dnorm(data[data[[Cnodes[k]]]==0][[Mnodes[k]]], 
-                                                               mean=predict(fitM[[k]]), sd=sd(data[data[[Cnodes[k]]]==0][[Mnodes[k]]]))]
+                                                               mean=mu.m, sd=sd(fitM[[k]]$residuals))]
+      mu.g.a1 <- predict(fitg[[k]], newdata=nd.a1[nd.a1[[Cnodes[k]]]==0,])
       data[data[[Cnodes[k]]]==0, paste0("g.a1.", k) := dnorm(data[data[[Cnodes[k]]]==0][[Mnodes[k]]], 
-                                                             mean=predict(fitg[[k]], newdata=nd.a1[nd.a1[[Cnodes[k]]]==0,]), sd=sd(data[data[[Cnodes[k]]]==0][[Mnodes[k]]]))]
+                                                             mean=mu.g.a1, sd=sd(fitg[[k]]$residuals))]
+      mu.g.a0 <- predict(fitg[[k]], newdata=nd.a0[nd.a0[[Cnodes[k]]]==0,])
       data[data[[Cnodes[k]]]==0, paste0("g.a0.", k) := dnorm(data[data[[Cnodes[k]]]==0][[Mnodes[k]]], 
-                                                             mean=predict(fitg[[k]], newdata=nd.a0[nd.a0[[Cnodes[k]]]==0,]), sd=sd(data[data[[Cnodes[k]]]==0][[Mnodes[k]]]))]
+                                                             mean=mu.g.a0, sd=sd(fitg[[k]]$residuals))]
     }
   }
   else{

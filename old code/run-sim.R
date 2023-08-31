@@ -8,13 +8,9 @@ library(sl3)
 library(data.table)
 
 # load code
-setwd("~/GitHub/NASH-mediation")
+setwd("C:\\Users\\VXMB\\OneDrive - Novo Nordisk\\Documents\\NASH-mediation")
 for(f in list.files("R",".R$",full.names=TRUE)){source(f)}
 for(f in list.files("functions",".R$",full.names=TRUE)){source(f)}
-
-fitM <-list()
-fitM[[2]] <- Mlearner$train(make_task(data[C2==0,], Mmodel[[1]]))
-fitM[[2]]$predict()
 
 # true values
 data00 <- simulateData(10^6, a =0, a.prime=0)
@@ -38,22 +34,6 @@ data11 <- simulateData(10^6, a =1, a.prime=1)
 data10 <- simulateData(10^6, a =1, a.prime=0)
 
 
-
-#stack <- sl3::Stack$new(Lrnr_glm_fast$new(), Lrnr_mean$new(), Lrnr_bayesglm$new(), 
-#                        Lrnr_gam$new(), Lrnr_caret$new(algorithm  = "glmStepAIC", trace=F))
-corP_screen <- sl3::Lrnr_screener_correlation$new(type = "threshold", pvalue_threshold = 0.05, min_screen = 1)
-#lrn_QL <- sl3::Lrnr_sl$new(learners = Stack$new(stack, Pipeline$new(corP_screen, stack)))
-lrn_QL <- sl3::Pipeline$new(corP_screen, Lrnr_glm_fast$new())
-
-data<- simulateData(10^6, betaL1.A=0, betaL2.A=0, betaY.A=0, betaY.AM=0)
-prop.table(table(data$RY))
-
-x <- tar_read(res_n500_noindirect)
-mean(x$sie)
-sd(x$sie);mean(na.omit(x$siese2))
-mean(x$sde+qnorm(0.975)*x$sdese2> sde.0  & sde.0 >x$sde-qnorm(0.975)*x$sdese2)
-
-
 # G formulas
 Cmodel = list("C1 ~ A + L01", "C2 ~ A + L1 + M1")
 Mmodel = list("M1 ~ A + L1 + L02", "M2 ~ M1 + A + L2 + L02")
@@ -66,51 +46,70 @@ QLmodel = list("QL1 ~ L01 + L02 + A", "QL2 ~ L01 + L02 + A + L1 + M1")
 
 
 res <- list()
-res2<- list()
-for(i in 6:500){
-  data <- simulateData(300)
-  fit <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01", "L02"), Anode = "A", Cnodes = c("C1", "C2"),
-                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                 Cmodel, Mmodel, gmodel, RYmodel, Ymodel, QLmodel, a1 = 1, a0 = 0, n_bins = 20)
-  fit2 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01", "L02"), Anode = "A", Cnodes = c("C1", "C2"),
-                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                  Cmodel, Mmodel, gmodel, RYmodel, Ymodel, QLmodel, a1 = 1, a0 = 0, n_bins = 20,
-                  Mlearner=MlearnerSL, glearner=MlearnerSL)
-  res[[i]] <- fit
-  res2[[i]] <-fit2
+trueval<- list()
+for(i in 51:1000){
+  data <- simulateData(4000);
+  fit_bin40 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
+                       Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
+                       Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
+                       Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                       gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                       RYmodel= "RY ~ A + M2 + L2", 
+                       Ymodel="Y ~ A + M2 + L2", 
+                       QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+                       a1 = 1, a0 = 0, n_bins = 40);
+  trueVal <- theTruth(n=10^6,coefM1 = fit_bin40$fitg[[1]]$coefficients, coefM2 = fit_bin40$fitg[[2]]$coefficients,
+                      sdM1 =sd(fit_bin40$fitg[[1]]$residuals) , sdM2 = sd(fit_bin40$fitg[[2]]$residuals))
+  res[[i]] <- fit_bin40$est
+  trueval[[i]] <-trueVal
   print(i)
 }
 
-Res <- matrix(unlist(res2), ncol = 18, byrow = TRUE)
+
+Res <- matrix(unlist(res), ncol = 16, byrow = TRUE)
+Truth <- matrix(unlist(trueval), ncol = 8, byrow = TRUE)
+
 
 # results sde
 mean(na.omit(Res[,1]))
-sd(Res[,1]); mean(sqrt(Res[,2])); mean(Res[, 3]); mean(sqrt(Res[,18]^2+Res[,12]^2)) 
-prop.table(table(sde.0 > Res[,1] - qnorm(0.975)*sqrt(Res[,18]^2+Res[,12]^2) & sde.0 < Res[,1] + qnorm(0.975)*sqrt(Res[,18]^2+Res[,12]^2))) 
-prop.table(table(sde.0 > Res[,1] - qnorm(0.975)*Res[, 3] & sde.0 < Res[,1] + qnorm(0.975)*Res[, 3]))
+mean(na.omit(Res[,1])-Truth[,4])
+sd(Res[,1]); mean(sqrt(Res[,2]))
+prop.table(table(Truth[,4] > Res[,1] - qnorm(0.975)*sqrt(Res[,2]) & Truth[,4] < Res[,1] + qnorm(0.975)*sqrt(Res[,2]))) 
+prop.table(table(sde.0 > Res[,1] - qnorm(0.975)*sqrt(Res[,2]) & sde.0 < Res[,1] + qnorm(0.975)*sqrt(Res[,2]))) 
 
 # results sie
-mean(na.omit(Res[,4]))
-sd(Res[,4]); mean(Res[, 6]); mean(sqrt(Res[,12]^2+Res[,15]^2)) 
-prop.table(table(sie.0 > Res[,4] - qnorm(0.975)*sqrt(Res[,12]^2+Res[,15]^2) & sie.0 < Res[,4] + qnorm(0.975)*sqrt(Res[,12]^2+Res[,15]^2)))
-prop.table(table(sie.0 > Res[,4] - qnorm(0.975)*Res[,6] & sie.0 < Res[,4] + qnorm(0.975)*Res[,6]))
+mean(na.omit(Res[,3]))
+mean(na.omit(Res[,3])-Truth[,5])
+sd(Res[,3]); mean(sqrt(Res[, 4])) 
+prop.table(table(Truth[,5] > Res[,3] - qnorm(0.975)*sqrt(Res[,4]) & Truth[,5] < Res[,3] + qnorm(0.975)*sqrt(Res[,4])))
+prop.table(table(sie.0 > Res[,3] - qnorm(0.975)*sqrt(Res[,4]) & sie.0 < Res[,3] + qnorm(0.975)*sqrt(Res[,4])))
 
-mean(na.omit(Res[,7]))
-sd(Res[,7]); mean(Res[, 9]); mean(sqrt(Res[,18]^2+Res[,15]^2)) 
-prop.table(table(te.0 > Res[,7] - qnorm(0.975)*sqrt(Res[, 15]^2+Res[, 18]^2) & te.0 < Res[,7] + qnorm(0.975)*sqrt(Res[, 15]^2+Res[, 18]^2)))
-prop.table(table(te.0 > Res[,7] - qnorm(0.975)*Res[,9] & te.0 < Res[,7] + qnorm(0.975)*Res[,9]))
 
-mean(na.omit(Res[,10]))
-sd(Res[,10]); mean(sqrt(Res[,11])); mean(Res[, 12])
-prop.table(table(psi10.0 > Res[,10] - qnorm(0.975)*Res[,12] & psi10.0 < Res[,10] + qnorm(0.975)*Res[,12]))
+mean(na.omit(Res[,5]))
+mean(na.omit(Res[,5])-Truth[,6])
+sd(Res[,5]); mean(sqrt(Res[, 6])) 
+prop.table(table(Truth[,6] > Res[,5] - qnorm(0.975)*sqrt(Res[, 6]) & Truth[,6] < Res[,5] + qnorm(0.975)*sqrt(Res[, 6])))
+prop.table(table(te.0> Res[,5] - qnorm(0.975)*sqrt(Res[, 6]) & te.0 < Res[,5] + qnorm(0.975)*sqrt(Res[, 6])))
 
+
+# psi11
+mean(na.omit(Res[,11]))
+mean(na.omit(Res[,11])-Truth[,1])
+sd(Res[,11]); mean(sqrt(Res[,12]))
+prop.table(table(Truth[,1] > Res[,11] - qnorm(0.975)*sqrt(Res[,12]) & Truth[,1] < Res[,11] + qnorm(0.975)*sqrt(Res[,12])))
+
+
+#psi01
 mean(na.omit(Res[,13]))
-sd(Res[,13]); mean(sqrt(Res[,11])); mean(Res[, 15])
-prop.table(table(psi11.0 > Res[,13] - qnorm(0.975)*Res[,15] & psi11.0 < Res[,13] + qnorm(0.975)*Res[,15]))
+mean(na.omit(Res[,13])-Truth[,2]) 
+sd(Res[,13]); mean(sqrt(Res[,14]))
+prop.table(table(Truth[,2] > Res[,13] - qnorm(0.975)*sqrt(Res[,14]) & Truth[,2] < Res[,13] + qnorm(0.975)*sqrt(Res[,14])))
 
-mean(na.omit(Res[,16]))
-sd(Res[,16]); mean(Res[, 18])
-prop.table(table(psi00.0 > Res[,16] - qnorm(0.975)*Res[,18] & psi00.0 < Res[,16] + qnorm(0.975)*Res[,18]))
+#psi00
+mean(na.omit(Res[,15]))
+mean(na.omit(Res[,15])-Truth[,3])
+sd(Res[,15]); mean(sqrt(Res[, 16]))
+prop.table(table(Truth[,3] > Res[,15] - qnorm(0.975)*sqrt(Res[,16]) & Truth[,3] < Res[,15] + qnorm(0.975)*sqrt(Res[,16])))
 
 
 

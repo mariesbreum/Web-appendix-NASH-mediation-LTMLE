@@ -44,6 +44,9 @@ fitLTMLE <- function(data, # data table or data frame
     lrn_QL <- QLlearner
   }
   
+
+
+  
   suppressMessages({
   # fit g model
   fitg <- list()
@@ -145,8 +148,10 @@ fitLTMLE <- function(data, # data table or data frame
     }
     # predict g_a_K
     if(is.null(glearner)){
-      g.a1 <- dnorm(m_K_discrete[i], mean = predict(fitg[[K]], newdata=nd.a1.mk[nd.a1.mk[[Cnodes[K]]]==0,]), sd=sd(data[data[[Cnodes[K]]]==0][[Mnodes[K]]]))
-      g.a0 <- dnorm(m_K_discrete[i], mean = predict(fitg[[K]], newdata=nd.a0.mk[nd.a0.mk[[Cnodes[K]]]==0,]), sd=sd(data[data[[Cnodes[K]]]==0][[Mnodes[K]]]))
+      mu.g.a1 <- predict(fitg[[K]], newdata=nd.a1.mk[nd.a1.mk[[Cnodes[K]]]==0,])
+      g.a1 <- dnorm(m_K_discrete[i], mean = mu.g.a1, sd=sd(fitg[[K]]$residuals))
+      mu.g.a0 <- predict(fitg[[K]], newdata=nd.a0.mk[nd.a0.mk[[Cnodes[K]]]==0,])
+      g.a0 <- dnorm(m_K_discrete[i], mean = mu.g.a0, sd=sd(fitg[[K]]$residuals))
     }
     else{
       g.a1 <- fitg[[K]]$predict(make_task(nd.a1.mk[nd.a1.mk[[Cnodes[K]]]==0,], Mmodel[[K]]))$likelihood
@@ -230,8 +235,10 @@ fitLTMLE <- function(data, # data table or data frame
 
       # predict g_a_k
       if(is.null(glearner)){
-        g.a1 <- dnorm(m_k_discrete[i], mean= predict(fitg[[K-k]], newdata=nd.a1.mk[nd.a1.mk[[Cnodes[K-k]]]==0,]), sd=sd(data[data[[Cnodes[K-k]]]==0][[Mnodes[K-k]]]))
-        g.a0 <- dnorm(m_k_discrete[i], mean= predict(fitg[[K-k]], newdata=nd.a0.mk[nd.a0.mk[[Cnodes[K-k]]]==0,]), sd=sd(data[data[[Cnodes[K-k]]]==0][[Mnodes[K-k]]]))
+        mu.g.a1 <- predict(fitg[[K-k]], newdata=nd.a1.mk[nd.a1.mk[[Cnodes[K-k]]]==0,])
+        g.a1 <- dnorm(m_k_discrete[i], mean = mu.g.a1, sd=sd(fitg[[k]]$residuals))
+        mu.g.a0 <- predict(fitg[[K-k]], newdata=nd.a0.mk[nd.a0.mk[[Cnodes[K-k]]]==0,])
+        g.a0 <- dnorm(m_k_discrete[i], mean = mu.g.a0, sd=sd(fitg[[k]]$residuals))
       }
       else{
         g.a1 <- fitg[[K-k]]$predict(make_task(nd.a1.mk[nd.a1.mk[[Cnodes[K-k]]]==0,], Mmodel[[K-k]]))$likelihood
@@ -280,7 +287,6 @@ fitLTMLE <- function(data, # data table or data frame
   set(data, j="QL_1.a1.ga0.star", value= plogis(qlogis(QL1.a1.ga0) + eps.a1.ga0)) 
   set(data, j="QL_1.a0.ga0.star", value= plogis(qlogis(QL1.a0.ga0) + eps.a0.ga0))
 
-  
   ### Compute eif ###
   set(data, j="eif.a1.ga1", value=data[[paste0("H.a1.ga1.", K+1)]]*(data[[Ynode]]-data[["QY_star.a1.ga1"]])+
     (data[["QL_1.a1.ga1.star"]]-data[, mean(QL_1.a1.ga1.star)]))
@@ -323,6 +329,8 @@ fitLTMLE <- function(data, # data table or data frame
                     "psi11"=psi.a1.ga1, "psi11var"=psi.a1.ga1.var,
                     "psi10"=psi.a1.ga0, "psi10var"=psi.a1.ga0.var,
                     "psi00"=psi.a0.ga0, "psi00var"=psi.a0.ga0.var)
+  
+  
   if(is.null(glearner)){
     out <- list(est=est, fitg=fitg) 
   }
