@@ -1,12 +1,12 @@
 library(targets)
 setwd("/Users/mariebreum/Documents/GitHub/NASH-mediation")
-x <- tar_read(res_n800)
-x <- x[bins==40,] 
+x <- tar_read(res_n4000_bins)
+x <- x[bins==20,] 
 
 mean(x$sde)
-mean(x$sde - sde.true)
+mean(x$sde - x$sde.true)
 sd(x$sde);mean(sqrt(x$sdevar))
-mean(x$sde.0 > x$sde - qnorm(0.975)*sqrt(x$sdevar) & x$sde.0 < x$sde + qnorm(0.975)*sqrt(x$sdevar))
+mean(x$sde.true > x$sde - qnorm(0.975)*sqrt(x$sdevar) & x$sde.true < x$sde + qnorm(0.975)*sqrt(x$sdevar))
 
 mean(x$sie)
 mean(x$sie-x$sie.true)
@@ -14,12 +14,12 @@ sd(x$sie);mean(sqrt(x$sievar))
 mean(x$sie.true > x$sie - qnorm(0.975)*sqrt(x$sievar) & x$sie.true < x$sie + qnorm(0.975)*sqrt(x$sievar))
 
 mean(x$oe)
-mean(x$oe-x$OE.true)
+mean(x$oe-x$oe.true)
 sd(x$oe);mean(sqrt(x$oevar))
-mean(x$OE.true > x$oe - qnorm(0.975)*x$oese & x$OE.true < x$oe + qnorm(0.975)*x$oese)
+mean(x$oe.true > x$oe - qnorm(0.975)*sqrt(x$oevar) & x$oe.true < x$oe + qnorm(0.975)*sqrt(x$oevar))
 
 
-mean(x$sde.prop)
+xmean(x$sde.prop)
 mean(x$sde.prop - x$sde.prop.true)
 sd(x$sde.prop);mean(sqrt(x$sde.prop.var))
 mean(x$sde.prop.true > x$sde.prop - qnorm(0.975)*x$sde.prop.se & x$sde.prop.true < x$sde.prop + qnorm(0.975)*x$sde.prop.se)

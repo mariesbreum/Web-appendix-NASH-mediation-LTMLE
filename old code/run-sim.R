@@ -47,7 +47,7 @@ QLmodel = list("QL1 ~ L01 + L02 + A", "QL2 ~ L01 + L02 + A + L1 + M1")
 
 res <- list()
 trueval<- list()
-for(i in 51:1000){
+for(i in 344:1000){
   data <- simulateData(4000);
   fit_bin40 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
                        Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
@@ -57,7 +57,7 @@ for(i in 51:1000){
                        RYmodel= "RY ~ A + M2 + L2", 
                        Ymodel="Y ~ A + M2 + L2", 
                        QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                       a1 = 1, a0 = 0, n_bins = 40);
+                       a1 = 1, a0 = 0, n_bins = 80);
   trueVal <- theTruth(n=10^6,coefM1 = fit_bin40$fitg[[1]]$coefficients, coefM2 = fit_bin40$fitg[[2]]$coefficients,
                       sdM1 =sd(fit_bin40$fitg[[1]]$residuals) , sdM2 = sd(fit_bin40$fitg[[2]]$residuals))
   res[[i]] <- fit_bin40$est
