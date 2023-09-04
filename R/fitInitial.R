@@ -22,17 +22,13 @@ fitInitial <- function(data,  # data table or data frame
                        Mlearner,
                        fitg, # fitted model g
                        fitM, # fitted model M
-                       pi=NULL
+                       pi
 ){
   
   data <- copy(data)
   K <- length(t)
   n <- nrow(data)
   
-  # compute fitted value pi
-  if(is.null(pi)){
-    pi <- data[, mean(get(Anode)==a1)]
-  }
   
   # Compute fitted values delta_k
   if(is.null(Clearner)){
@@ -91,6 +87,10 @@ fitInitial <- function(data,  # data table or data frame
         (1*(data[[Anode]]==a1 & data[[Cnodes[1]]]==0)/data[[paste0("pC.", 1)]]))
   set(data, j=paste0("H.a0.ga0.", 1), value = (1/(1-pi)) * 
         (1*(data[[Anode]]==a0 & data[[Cnodes[1]]]==0)/data[[paste0("pC.", 1)]]))
+  set(data, j=paste0("H.a1.g*.", 1), value = (1/pi) * 
+        (1*(data[[Anode]]==a1 & data[[Cnodes[1]]]==0)/data[[paste0("pC.", 1)]]))
+  set(data, j=paste0("H.a0.g*.", 1), value = (1/(1-pi)) * 
+        (1*(data[[Anode]]==a0 & data[[Cnodes[1]]]==0)/data[[paste0("pC.", 1)]]))
   
   for(i in 2:K){
     set(data, j = paste0("H.a1.ga1.", i), value = data[[paste0("H.a1.ga1.", i-1)]]*
@@ -102,6 +102,12 @@ fitInitial <- function(data,  # data table or data frame
     set(data, j = paste0("H.a0.ga0.", i), value = data[[paste0("H.a0.ga0.", i-1)]]*
           (1*(data[[Cnodes[i]]]==0)/data[[paste0("pC.",i)]])*
           (data[[paste0("g.a0.", i-1)]]/data[[paste0("pM.", i-1)]]))
+    set(data, j = paste0("H.a1.g*.", i), value = data[[paste0("H.a1.g*.", i-1)]]*
+          (1*(data[[Cnodes[i]]]==0)/data[[paste0("pC.",i)]])*
+          ((data[[paste0("g.a1.", i-1)]]*pi + data[[paste0("g.a0.", i-1)]]*(1-pi))/data[[paste0("pM.", i-1)]]))
+    set(data, j = paste0("H.a0.g*.", i), value = data[[paste0("H.a0.g*.", i-1)]]*
+          (1*(data[[Cnodes[i]]]==0)/data[[paste0("pC.",i)]])*
+          ((data[[paste0("g.a1.", i-1)]]*pi + data[[paste0("g.a0.", i-1)]]*(1-pi))/data[[paste0("pM.", i-1)]]))
   }
   
   set(data, j = paste0("H.a1.ga1.", K+1), value = data[[paste0("H.a1.ga1.", K)]] * 
@@ -113,11 +119,18 @@ fitInitial <- function(data,  # data table or data frame
   set(data, j = paste0("H.a0.ga0.", K+1), value = data[[paste0("H.a0.ga0.", K)]] * 
         (1*(data[[RYnode]]==1)/data[["pRY"]])* 
         (data[[paste0("g.a0.", K)]]/data[[paste0("pM.", K)]]))
+  set(data, j = paste0("H.a1.g*.", K+1), value = data[[paste0("H.a1.g*.", K)]] * 
+        (1*(data[[RYnode]]==1)/data[["pRY"]])* 
+        ((data[[paste0("g.a1.", K)]]*pi + data[[paste0("g.a0.", K)]]*(1-pi))/data[[paste0("pM.", K)]]))
+  set(data, j = paste0("H.a0.g*.", K+1), value = data[[paste0("H.a0.g*.", K)]] * 
+        (1*(data[[RYnode]]==1)/data[["pRY"]])* 
+        ((data[[paste0("g.a1.", K)]]*pi + data[[paste0("g.a0.", K)]]*(1-pi))/data[[paste0("pM.", K)]]))
   
   data[is.na(data)] <- 0
   
   out_columns <-c(sapply(1:(K+1), function(i) paste0("H.a1.ga1.", i)), sapply(1:(K+1), function(i) paste0("H.a1.ga0.", i)),
-                  sapply(1:(K+1), function(i) paste0("H.a0.ga0.", i)))
+                  sapply(1:(K+1), function(i) paste0("H.a0.ga0.", i)), sapply(1:(K+1), function(i) paste0("H.a1.g*.", i)),
+                  sapply(1:(K+1), function(i) paste0("H.a0.g*.", i)))
   data[,..out_columns]
   
 }
