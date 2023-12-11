@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# fitLTMLE
+# -----------------------------------------------------------------------------
+# Description:
+# This function returns targeted estimates of the direct and indirect effects. 
+#
 fitLTMLE <- function(data, # data table or data frame 
                      t, # numeric vector (analysis visits)
                      L0nodes, # character vector (baseline covariates)
@@ -12,7 +18,7 @@ fitLTMLE <- function(data, # data table or data frame
                      gmodel, # list of models for g_i
                      RYmodel, # model for R.Y
                      Ymodel, # model for initial regression QY
-                     QLmodel, # list of covariates for regressions QL_i
+                     QLmodel, # model for initial regression QL
                      a1, # level of treatment var corresponding to a1
                      a0, # level of treatment var corresponding to a0
                      n_bins, # number of partitions used for the numerical integration
@@ -38,7 +44,6 @@ fitLTMLE <- function(data, # data table or data frame
     pi <- data[, mean(get(Anode)==a1)]
   }
   
-  
   if(is.null(QLlearner)){
     #stack <- sl3::Stack$new(Lrnr_glm_fast$new(), Lrnr_mean$new(), Lrnr_bayesglm$new(), 
     #                        Lrnr_gam$new(), Lrnr_caret$new(algorithm  = "glmStepAIC", trace=F))
@@ -49,8 +54,7 @@ fitLTMLE <- function(data, # data table or data frame
   else{
     lrn_QL <- QLlearner
   }
-  
-  
+
   suppressMessages({
   # fit g model
   fitg <- list()
@@ -66,7 +70,7 @@ fitLTMLE <- function(data, # data table or data frame
   }
   
   # fit M model
-  if(identical(gmodel, Mmodel) == TRUE & identical(glearner, Mlearner) == TRUE ){
+  if(identical(gmodel, Mmodel) == TRUE & identical(glearner, Mlearner) == TRUE){
     fitM <- fitg
   }
   else{
@@ -83,6 +87,7 @@ fitLTMLE <- function(data, # data table or data frame
     }
   }
   })
+  
   # compute weights/clever covariates
   data <- cbind(data, fitInitial(data, t, Anode, Cnodes, Mnodes, RYnode, Cmodel, gmodel, RYmodel, a1, a0,
                                  Clearner, RYlearner, glearner, Mlearner, fitg, fitM, pi))
@@ -94,6 +99,7 @@ fitLTMLE <- function(data, # data table or data frame
   else{
     fitY <- Ylearner$train(make_task(data[data[[RYnode]]==1,], Ymodel))
   }
+  
   ### Compute QY_star ###
   
   # initial predictions QY
@@ -119,25 +125,15 @@ fitLTMLE <- function(data, # data table or data frame
   eps.a0.ga0 <- coef(glm.fit(x=rep(1, nrow(data[data[[Cnodes[K]]]==0,])), y = data[data[[Cnodes[K]]]==0,][[Ynode]], 
                              weights = data[data[[Cnodes[K]]]==0,][[paste0("H.a0.ga0.", K+1)]], offset = qlogis(QY.a0), 
                              family = quasibinomial()))
-  eps.a1.gstar <- coef(glm.fit(x=rep(1, nrow(data[data[[Cnodes[K]]]==0,])), y = data[data[[Cnodes[K]]]==0,][[Ynode]], 
-                             weights = data[data[[Cnodes[K]]]==0,][[paste0("H.a1.g*.", K+1)]], offset = qlogis(QY.a1), 
-                             family = quasibinomial()))
-  eps.a0.gstar <- coef(glm.fit(x=rep(1, nrow(data[data[[Cnodes[K]]]==0,])), y = data[data[[Cnodes[K]]]==0,][[Ynode]], 
-                             weights = data[data[[Cnodes[K]]]==0,][[paste0("H.a0.g*.", K+1)]], offset = qlogis(QY.a0), 
-                             family = quasibinomial()))
   
   # Update QY
   data[, "QY_star.a1.ga1" := 0]
   data[, "QY_star.a1.ga0" := 0]
   data[, "QY_star.a0.ga0" := 0]
-  data[, "QY_star.a1.gstar" := 0]
-  data[, "QY_star.a0.gstar" := 0]
   data[data[[Cnodes[K]]]==0 , "QY_star.a1.ga1" := plogis(qlogis(QY.a1) + eps.a1.ga1)]
   data[data[[Cnodes[K]]]==0 , "QY_star.a1.ga0" := plogis(qlogis(QY.a1) + eps.a1.ga0)]
   data[data[[Cnodes[K]]]==0 , "QY_star.a0.ga0" := plogis(qlogis(QY.a0) + eps.a0.ga0)]
-  data[data[[Cnodes[K]]]==0 , "QY_star.a1.gstar" := plogis(qlogis(QY.a1) + eps.a1.gstar)]
-  data[data[[Cnodes[K]]]==0 , "QY_star.a0.gstar" := plogis(qlogis(QY.a0) + eps.a0.gstar)]
-  
+
   ### Compute QM_K ###
   
   # discrete grid m_K
@@ -147,8 +143,7 @@ fitLTMLE <- function(data, # data table or data frame
   data[, paste0("QM_", K, ".a1.ga1") := 0]
   data[, paste0("QM_", K, ".a1.ga0") := 0]
   data[, paste0("QM_", K, ".a0.ga0") := 0]
-  data[, paste0("QM_", K, ".a1.gstar") := 0]
-  data[, paste0("QM_", K, ".a0.gstar") := 0]
+
   for(i in 1:(n_bins-1)){
     nd.a1.mk <- copy(nd.a1)[nd.a1[[Mnodes[K]]]!=m_K_discrete[i], Mnodes[K]:=m_K_discrete[i]]
     nd.a0.mk <- copy(nd.a0)[nd.a0[[Mnodes[K]]]!=m_K_discrete[i], Mnodes[K]:=m_K_discrete[i]]
@@ -168,12 +163,10 @@ fitLTMLE <- function(data, # data table or data frame
       g.a1 <- dnorm(m_K_discrete[i], mean = mu.g.a1, sd=sd(fitg[[K]]$residuals))
       mu.g.a0 <- predict(fitg[[K]], newdata=nd.a0.mk[nd.a0.mk[[Cnodes[K]]]==0,])
       g.a0 <- dnorm(m_K_discrete[i], mean = mu.g.a0, sd=sd(fitg[[K]]$residuals))
-      g.star <- g.a1*pi + g.a0*(1-pi)
     }
     else{
       g.a1 <- fitg[[K]]$predict(make_task(nd.a1.mk[nd.a1.mk[[Cnodes[K]]]==0,], Mmodel[[K]]))$likelihood
       g.a0 <- fitg[[K]]$predict(make_task(nd.a0.mk[nd.a0.mk[[Cnodes[K]]]==0,], Mmodel[[K]]))$likelihood
-      g.star <- g.a1*pi + g.a0*(1-pi)
     }
     set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a1.ga1"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a1.ga1")]] + 
           plogis(qlogis(QY.a1) + eps.a1.ga1)*g.a1*diff(m_K_discrete)[i])
@@ -181,10 +174,6 @@ fitLTMLE <- function(data, # data table or data frame
           plogis(qlogis(QY.a1) + eps.a1.ga0)*g.a0*diff(m_K_discrete)[i])
     set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a0.ga0"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a0.ga0")]] + 
           plogis(qlogis(QY.a0) + eps.a0.ga0)*g.a0*diff(m_K_discrete)[i])
-    set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a1.gstar"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a1.gstar")]] + 
-          plogis(qlogis(QY.a1) + eps.a1.gstar)*g.star*diff(m_K_discrete)[i])
-    set(data, i = which(data[[Cnodes[K]]]==0), j = paste0("QM_", K, ".a0.gstar"), value = data[data[[Cnodes[K]]]==0, ][[paste0("QM_", K, ".a0.gstar")]] + 
-          plogis(qlogis(QY.a0) + eps.a0.gstar)*g.star*diff(m_K_discrete)[i])
   }
   
   QLcov <- lapply(1:K, function(i) paste(all.vars(as.formula(QLmodel[[i]]))[2:length(all.vars(as.formula(QLmodel[[i]])))], collapse="+"))
@@ -200,14 +189,9 @@ fitLTMLE <- function(data, # data table or data frame
                                           paste0("QM_",K-k+1, ".a1.ga0~",QLcov[K-k+1])))
     fitL.a0.ga0 <- lrn_QL$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
                                           paste0("QM_",K-k+1, ".a0.ga0~",QLcov[K-k+1])))
-    fitL.a1.gstar <- lrn_QL$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
-                                          paste0("QM_",K-k+1, ".a1.gstar~",QLcov[K-k+1])))
-    fitL.a0.gstar <- lrn_QL$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
-                                          paste0("QM_",K-k+1, ".a0.gstar~",QLcov[K-k+1])))
     
     # initial predictions QL_k+1
-    newcols <- c(paste0("QM_",K-k+1, ".a1.ga1"), paste0("QM_",K-k+1, ".a1.ga0"), paste0("QM_",K-k+1, ".a0.ga0"),
-                 paste0("QM_",K-k+1, ".a1.gstar"), paste0("QM_",K-k+1, ".a0.gstar"))
+    newcols <- c(paste0("QM_",K-k+1, ".a1.ga1"), paste0("QM_",K-k+1, ".a1.ga0"), paste0("QM_",K-k+1, ".a0.ga0"))
     nd.a1 <- cbind(nd.a1, data[,..newcols])
     nd.a0 <- cbind(nd.a0, data[,..newcols])
     
@@ -217,11 +201,6 @@ fitLTMLE <- function(data, # data table or data frame
                                                                          paste0("QM_",K-k+1, ".a1.ga0", "~",QLcov[K-k+1])))))
     QL.a0.ga0 <- pmin(1-alpha, pmax(alpha, fitL.a0.ga0$predict(make_prediction_task(nd.a0[nd.a0[[Cnodes[K-k]]]==0,],
                                                                          paste0("QM_",K-k+1, ".a0.ga0", "~",QLcov[K-k+1])))))
-    QL.a1.gstar <- pmin(1-alpha, pmax(alpha, fitL.a1.ga0$predict(make_prediction_task(nd.a1[nd.a1[[Cnodes[K-k]]]==0,], 
-                                                                                    paste0("QM_",K-k+1, ".a1.gstar", "~",QLcov[K-k+1])))))
-    QL.a0.gstar <- pmin(1-alpha, pmax(alpha, fitL.a0.ga0$predict(make_prediction_task(nd.a0[nd.a0[[Cnodes[K-k]]]==0,],
-                                                                                    paste0("QM_",K-k+1, ".a0.gstar", "~",QLcov[K-k+1])))))
-    
 
     # target QL_k+1
     eps.a1.ga1 <- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K-k]]]==0,])), y = data[data[[Cnodes[K-k]]]==0,][[paste0("QM_",K-k+1, ".a1.ga1")]], 
@@ -236,24 +215,14 @@ fitLTMLE <- function(data, # data table or data frame
                                weights = data[data[[Cnodes[K-k]]]==0,][[paste0("H.a0.ga0.",K-k+1)]], offset = qlogis(QL.a0.ga0), 
                                family = quasibinomial()))
     
-    eps.a1.gstar <- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K-k]]]==0,])), y = data[data[[Cnodes[K-k]]]==0,][[paste0("QM_",K-k+1, ".a1.gstar")]], 
-                               weights = data[data[[Cnodes[K-k]]]==0,][[paste0("H.a1.g*.", K-k+1)]], offset = qlogis(QL.a1.gstar), 
-                               family = quasibinomial()))
-    
-    eps.a0.gstar <- coef(glm.fit(x = rep(1, nrow(data[data[[Cnodes[K-k]]]==0,])), y = data[data[[Cnodes[K-k]]]==0,][[paste0("QM_",K-k+1, ".a0.gstar")]], 
-                               weights = data[data[[Cnodes[K-k]]]==0,][[paste0("H.a0.g*.",K-k+1)]], offset = qlogis(QL.a0.gstar), 
-                               family = quasibinomial()))
     
     data[, paste0("QL_", K-k+1, ".a1.ga1.star"):= 0]
     data[, paste0("QL_", K-k+1, ".a1.ga0.star"):= 0]
     data[, paste0("QL_", K-k+1, ".a0.ga0.star"):= 0]
-    data[, paste0("QL_", K-k+1, ".a1.gstar.star"):= 0]
-    data[, paste0("QL_", K-k+1, ".a0.gstar.star"):= 0]
     data[data[[Cnodes[K-k]]]==0, paste0("QL_", K-k+1, ".a1.ga1.star"):= plogis(qlogis(QL.a1.ga1) + eps.a1.ga1)]
     data[data[[Cnodes[K-k]]]==0, paste0("QL_", K-k+1, ".a1.ga0.star"):= plogis(qlogis(QL.a1.ga0) + eps.a1.ga0)]
     data[data[[Cnodes[K-k]]]==0, paste0("QL_", K-k+1, ".a0.ga0.star"):= plogis(qlogis(QL.a0.ga0) + eps.a0.ga0)]
-    data[data[[Cnodes[K-k]]]==0, paste0("QL_", K-k+1, ".a1.gstar.star"):= plogis(qlogis(QL.a1.gstar) + eps.a1.gstar)]
-    data[data[[Cnodes[K-k]]]==0, paste0("QL_", K-k+1, ".a0.gstar.star"):= plogis(qlogis(QL.a0.gstar) + eps.a0.gstar)]
+
     
     ### Compute QM_k ###
     
@@ -264,8 +233,6 @@ fitLTMLE <- function(data, # data table or data frame
     data[, paste0("QM_", K-k, ".a1.ga1") :=0]
     data[, paste0("QM_", K-k, ".a1.ga0") :=0]
     data[, paste0("QM_", K-k, ".a0.ga0") :=0]
-    data[, paste0("QM_", K-k, ".a1.gstar") :=0]
-    data[, paste0("QM_", K-k, ".a0.gstar") :=0]
     
     for(i in 1:(n_bins-1)){
       nd.a1.mk <- copy(nd.a1)[nd.a1[[Mnodes[K-k]]]!= m_k_discrete[i], Mnodes[K-k]:=m_k_discrete[i]]
@@ -278,11 +245,7 @@ fitLTMLE <- function(data, # data table or data frame
                                                                     paste0("QM_",K-k+1, ".a1.ga0", "~",QLcov[K-k+1])))))
       QL.a0.ga0 <- pmin(1-alpha, pmax(alpha, fitL.a0.ga0$predict(make_prediction_task(nd.a0.mk[nd.a0.mk[[Cnodes[K-k]]]==0,],
                                                                     paste0("QM_",K-k+1, ".a0.ga0", "~",QLcov[K-k+1])))))
-      QL.a1.gstar <- pmin(1-alpha, pmax(alpha, fitL.a1.ga0$predict(make_prediction_task(nd.a1.mk[nd.a1.mk[[Cnodes[K-k]]]==0,], 
-                                                                                      paste0("QM_",K-k+1, ".a1.gstar", "~",QLcov[K-k+1])))))
-      QL.a0.gstar <- pmin(1-alpha, pmax(alpha, fitL.a0.ga0$predict(make_prediction_task(nd.a0.mk[nd.a0.mk[[Cnodes[K-k]]]==0,],
-                                                                                      paste0("QM_",K-k+1, ".a0.gstar", "~",QLcov[K-k+1])))))
-      
+
 
       # predict g_a_k
       if(is.null(glearner)){
@@ -290,12 +253,10 @@ fitLTMLE <- function(data, # data table or data frame
         g.a1 <- dnorm(m_k_discrete[i], mean = mu.g.a1, sd=sd(fitg[[k]]$residuals))
         mu.g.a0 <- predict(fitg[[K-k]], newdata=nd.a0.mk[nd.a0.mk[[Cnodes[K-k]]]==0,])
         g.a0 <- dnorm(m_k_discrete[i], mean = mu.g.a0, sd=sd(fitg[[k]]$residuals))
-        g.star <- g.a1*pi + g.a0*(1-pi)
       }
       else{
         g.a1 <- fitg[[K-k]]$predict(make_task(nd.a1.mk[nd.a1.mk[[Cnodes[K-k]]]==0,], Mmodel[[K-k]]))$likelihood
         g.a0 <- fitg[[K-k]]$predict(make_task(nd.a0.mk[nd.a0.mk[[Cnodes[K-k]]]==0,], Mmodel[[K-k]]))$likelihood
-        g.star <- g.a1*pi + g.a0*(1-pi)
       }
       set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".a1.ga1"), value = data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".a1.ga1")]] + 
             plogis(qlogis(QL.a1.ga1) + eps.a1.ga1)*g.a1*diff(m_k_discrete)[i])
@@ -303,10 +264,6 @@ fitLTMLE <- function(data, # data table or data frame
             plogis(qlogis(QL.a1.ga0) + eps.a1.ga0)*g.a0*diff(m_k_discrete)[i])
       set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".a0.ga0"), value = data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".a0.ga0")]] + 
             plogis(qlogis(QL.a0.ga0) + eps.a0.ga0)*g.a0*diff(m_k_discrete)[i])
-      set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".a1.gstar"), value = data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".a1.gstar")]] + 
-            plogis(qlogis(QL.a1.gstar) + eps.a1.gstar)*g.star*diff(m_k_discrete)[i])
-      set(data, i = which(data[[Cnodes[K-k]]]==0), j = paste0("QM_", K-k, ".a0.gstar"), value = data[data[[Cnodes[K-k]]]==0, ][[paste0("QM_", K-k, ".a0.gstar")]] + 
-            plogis(qlogis(QL.a0.gstar) + eps.a0.gstar)*g.star*diff(m_k_discrete)[i])
       
     }
   }
@@ -317,11 +274,9 @@ fitLTMLE <- function(data, # data table or data frame
   fitL.a1.ga1 <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a1.ga1", "~",QLcov[1])))
   fitL.a1.ga0 <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a1.ga0", "~",QLcov[1])))
   fitL.a0.ga0 <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a0.ga0", "~",QLcov[1])))
-  fitL.a1.gstar <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a1.gstar", "~",QLcov[1])))
-  fitL.a0.gstar <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a0.gstar", "~",QLcov[1])))
-  
+
   # initial predictions QL_1
-  newcols <- c("QM_1.a1.ga1", "QM_1.a1.ga0", "QM_1.a0.ga0", "QM_1.a1.gstar", "QM_1.a0.gstar")
+  newcols <- c("QM_1.a1.ga1", "QM_1.a1.ga0", "QM_1.a0.ga0")
   nd.a1 <- cbind(nd.a1, data[,..newcols])
   nd.a0 <- cbind(nd.a0, data[,..newcols])
   QL1.a1.ga1 <- pmin(1-alpha, pmax(alpha, fitL.a1.ga1$predict(make_prediction_task(nd.a1, 
@@ -330,10 +285,7 @@ fitLTMLE <- function(data, # data table or data frame
                                                                  paste0("QM_1.a1.ga0", "~",QLcov[1])))))
   QL1.a0.ga0 <- pmin(1-alpha, pmax(alpha, fitL.a0.ga0$predict(make_prediction_task(nd.a0, 
                                                                  paste0("QM_1.a0.ga0", "~",QLcov[1])))))
-  QL1.a1.gstar <- pmin(1-alpha, pmax(alpha, fitL.a1.ga0$predict(make_prediction_task(nd.a1, 
-                                                                                   paste0("QM_1.a1.gstar", "~",QLcov[1])))))
-  QL1.a0.gstar <- pmin(1-alpha, pmax(alpha, fitL.a0.ga0$predict(make_prediction_task(nd.a0, 
-                                                                                   paste0("QM_1.a0.gstar", "~",QLcov[1])))))
+
 
   # target QL_1
   eps.a1.ga1 <- coef(glm.fit(x = rep(1, n), y = data[["QM_1.a1.ga1"]], 
@@ -345,18 +297,11 @@ fitLTMLE <- function(data, # data table or data frame
   eps.a0.ga0 <- coef(glm.fit(x = rep(1, n), y = data[["QM_1.a0.ga0"]], 
                              weights = data[[paste0("H.a0.ga0.", 1)]], offset = qlogis(QL1.a0.ga0), 
                              family = quasibinomial()))
-  eps.a1.gstar <- coef(glm.fit(x = rep(1, n), y = data[["QM_1.a1.gstar"]], 
-                             weights = data[[paste0("H.a1.g*.", 1)]], offset = qlogis(QL1.a1.gstar), 
-                             family = quasibinomial()))
-  eps.a0.gstar <- coef(glm.fit(x = rep(1, n), y = data[["QM_1.a0.gstar"]], 
-                             weights = data[[paste0("H.a0.g*.", 1)]], offset = qlogis(QL1.a0.gstar), 
-                             family = quasibinomial()))
-  
+
   set(data, j="QL_1.a1.ga1.star", value= plogis(qlogis(QL1.a1.ga1) + eps.a1.ga1))
   set(data, j="QL_1.a1.ga0.star", value= plogis(qlogis(QL1.a1.ga0) + eps.a1.ga0)) 
   set(data, j="QL_1.a0.ga0.star", value= plogis(qlogis(QL1.a0.ga0) + eps.a0.ga0))
-  set(data, j="QL_1.a1.gstar.star", value= plogis(qlogis(QL1.a1.gstar) + eps.a1.gstar)) 
-  set(data, j="QL_1.a0.gstar.star", value= plogis(qlogis(QL1.a0.gstar) + eps.a0.gstar))
+
 
   ### Compute eif ###
   set(data, j="eif.a1.ga1", value=data[[paste0("H.a1.ga1.", K+1)]]*(data[[Ynode]]-data[["QY_star.a1.ga1"]])+
@@ -365,10 +310,7 @@ fitLTMLE <- function(data, # data table or data frame
         (data[["QL_1.a1.ga0.star"]]-data[, mean(QL_1.a1.ga0.star)]))
   set(data, j="eif.a0.ga0", value=data[[paste0("H.a0.ga0.", K+1)]]*(data[[Ynode]]-data[["QY_star.a0.ga0"]])+
         (data[["QL_1.a0.ga0.star"]]-data[, mean(QL_1.a0.ga0.star)]))
-  set(data, j="eif.a1.g*", value=data[[paste0("H.a1.g*.", K+1)]]*(data[[Ynode]]-data[["QY_star.a1.gstar"]])+
-        (data[["QL_1.a1.gstar.star"]]-mean(data[["QL_1.a1.gstar.star"]])))
-  set(data, j="eif.a0.g*", value=data[[paste0("H.a0.g*.", K+1)]]*(data[[Ynode]]-data[["QY_star.a0.gstar"]])+
-        (data[["QL_1.a0.gstar.star"]]-mean(data[["QL_1.a0.gstar.star"]])))
+
   
   for(i in 1:K){
     set(data, j="eif.a1.ga1", value = data[["eif.a1.ga1"]] + 
@@ -377,40 +319,32 @@ fitLTMLE <- function(data, # data table or data frame
           data[[paste0("H.a1.ga0.", i)]]*(data[[paste0("QM_", i, ".a1.ga0")]] - data[[paste0("QL_", i, ".a1.ga0.star")]]))
     set(data, j="eif.a0.ga0", value = data[["eif.a0.ga0"]] + 
           data[[paste0("H.a0.ga0.", i)]]*(data[[paste0("QM_", i, ".a0.ga0")]] - data[[paste0("QL_", i, ".a0.ga0.star")]]))
-    set(data, j="eif.a1.g*", value = data[["eif.a1.g*"]] + 
-          data[[paste0("H.a1.g*.", i)]]*(data[[paste0("QM_", i, ".a1.gstar")]] - data[[paste0("QL_", i, ".a1.gstar.star")]]))
-    set(data, j="eif.a0.g*", value = data[["eif.a0.g*"]] + 
-          data[[paste0("H.a0.g*.", i)]]*(data[[paste0("QM_", i, ".a0.gstar")]] - data[[paste0("QL_", i, ".a0.gstar.star")]]))
   }
   
   ### Estimands ###
   sde <- data[, mean(QL_1.a1.ga0.star)-mean(QL_1.a0.ga0.star)] 
   sie <- data[, mean(QL_1.a1.ga1.star)-mean(QL_1.a1.ga0.star)] 
   oe <- data[, mean(QL_1.a1.ga1.star)-mean(QL_1.a0.ga0.star)]
-  gsde <- data[, mean(QL_1.a1.gstar.star)-mean(QL_1.a0.gstar.star)] 
-  sde.prop <- sde/oe
-  sie.prop <- sie/oe
   psi.a1.ga1 <-data[, mean(QL_1.a1.ga1.star)]
   psi.a1.ga0 <-data[, mean(QL_1.a1.ga0.star)]
   psi.a0.ga0 <-data[, mean(QL_1.a0.ga0.star)]
   sdevar <- data[, var(eif.a1.ga0 - eif.a0.ga0)/n]
   sievar <- data[, var(eif.a1.ga1 - eif.a1.ga0)/n]
   oevar <- data[, var(eif.a1.ga1 - eif.a0.ga0)/n]
-  gsdevar <- var(data[["eif.a1.g*"]] - data[["eif.a0.g*"]])/n
-  sde.prop.var <- data[, var(((eif.a1.ga0 - eif.a0.ga0 + sde)/oe)-(sde/oe^2)*(eif.a1.ga1 - eif.a0.ga0 + oe)) / n]
-  sie.prop.var <- data[, var(((eif.a1.ga1 - eif.a1.ga0 + sie)/oe)-(sie/oe^2)*(eif.a1.ga1 - eif.a0.ga0 + oe)) / n]
   psi.a1.ga1.var <-data[, var(eif.a1.ga1)/n]
   psi.a1.ga0.var <-data[, var(eif.a1.ga0)/n]
   psi.a0.ga0.var <-data[, var(eif.a0.ga0)/n]
+  
   est <- data.table("sde"=sde, "sdevar"=sdevar,
                     "sie"=sie, "sievar"=sievar,
                     "oe"=oe, "oevar"=oevar, 
-                    "gsde"=gsde, "gsdevar"=gsdevar, 
-                    "sde.prop"=sde.prop, "sde.prop.var"=sde.prop.var,
-                    "sie.prop"=sie.prop, "sie.prop.var"=sie.prop.var,
                     "psi11"=psi.a1.ga1, "psi11var"=psi.a1.ga1.var,
                     "psi10"=psi.a1.ga0, "psi10var"=psi.a1.ga0.var,
                     "psi00"=psi.a0.ga0, "psi00var"=psi.a0.ga0.var)
+  
+  est <- data.table("par" = c("sde", "sie", "oe", "psi11", "psi10", "psi00"),
+                    "est" = c(sde, sie, oe, psi.a1.ga1, psi.a1.ga0, psi.a0.ga0),
+                    "var" = c(sdevar, sievar, oevar, psi.a1.ga1.var, psi.a1.ga0.var, psi.a0.ga0.var))
   
   
   if(is.null(glearner)){
