@@ -32,27 +32,28 @@ data <- simulateData(n=500)
 ```
 
 ``` r
-fit <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
+fit <-fitLTMLE(data, t = c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-               Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-               Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-               gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-               RYmodel= "RY ~ A + M2 + L2", 
-               Ymodel="Y ~ A + M2 + L2", 
-               QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+               Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
+               Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+               gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+               RYmodel = "RY ~ A + M2 + L2", 
+               Ymodel = "Y ~ A + M2 + L2", 
+               QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
                a1 = 1, a0 = 0, n_bins = 40)
 fit$est
-#>      par        est         var
-#> 1:   sde 0.11503069 0.007786138
-#> 2:   sie 0.00169643 0.005290155
-#> 3:    oe 0.11672712 0.002189614
-#> 4: psi11 0.35620454 0.001148217
-#> 5: psi10 0.35450811 0.006745420
-#> 6: psi00 0.23947742 0.001045378
+#>      par        est          var
+#> 1:   sde 0.07525518 0.0043907842
+#> 2:   sie 0.04010699 0.0025264039
+#> 3:    oe 0.11536217 0.0019474829
+#> 4: psi11 0.31227915 0.0010734833
+#> 5: psi10 0.27217216 0.0035248918
+#> 6: psi00 0.19691697 0.0008841459
 ```
 
 Nuisance parameters can be modeled with any machine learning algorithm
-supported by sl3 R package
+supported by the [<tt>`sl3`</tt>](https://github.com/tlverse/sl3) R
+package
 
 ``` r
 lrn_stack <- Stack$new(Lrnr_glm_fast$new(), Lrnr_mean$new(), Lrnr_bayesglm$new(), 
@@ -61,24 +62,24 @@ lrn_sl <- Lrnr_sl$new(learners = lrn_stack)
 ```
 
 ``` r
-fitSL <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
+fitSL <-fitLTMLE(data, t = c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                 RYmodel= "RY ~ A + M2 + L2", 
-                 Ymodel="Y ~ A + M2 + L2", 
-                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+                 Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
+                 Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                 gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                 RYmodel = "RY ~ A + M2 + L2", 
+                 Ymodel = "Y ~ A + M2 + L2", 
+                 QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
                  a1 = 1, a0 = 0, n_bins = 40,
-                 Ylearner=lrn_sl, RYlearner = lrn_sl, Clearner = lrn_sl)
+                 Ylearner = lrn_sl, RYlearner = lrn_sl, Clearner = lrn_sl)
 fitSL$est
 #>      par        est         var
-#> 1:   sde 0.10100678 0.006651031
-#> 2:   sie 0.01423091 0.004344599
-#> 3:    oe 0.11523769 0.002190961
-#> 4: psi11 0.35762046 0.001160378
-#> 5: psi10 0.34338955 0.005620386
-#> 6: psi00 0.24238276 0.001035007
+#> 1:   sde 0.07643358 0.004296557
+#> 2:   sie 0.03952267 0.002475387
+#> 3:    oe 0.11595626 0.001969123
+#> 4: psi11 0.31302324 0.001080487
+#> 5: psi10 0.27350056 0.003414826
+#> 6: psi00 0.19706698 0.000898441
 ```
 
 ## Simulation study
@@ -87,3 +88,5 @@ Our simulations studies are organized with the help of the targets
 package (see <https://books.ropensci.org/targets/>). The simulation
 set-up is defined in the master file ./\_targets.R. The results can be
 assessed by the function tar_read() as shown below.
+
+## References

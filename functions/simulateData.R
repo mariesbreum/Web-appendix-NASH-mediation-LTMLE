@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
-# Simulation data simple 
+# simulateData
 # -----------------------------------------------------------------------------
-# R code:
+# Description:
 # simulate data from longitudinal mediation setting with baseline treatment (A),
 # follow-up times t=1,2 where possible dropout (C1, C2), mediators (M1, M2) 
 # and covariates (L1, L2) are recorded, and a binary outcome (Y) subject to 

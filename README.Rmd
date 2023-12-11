@@ -43,19 +43,19 @@ data <- simulateData(n=500)
 
 
 ```{r echo = TRUE, eval = TRUE}
-fit <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
+fit <-fitLTMLE(data, t = c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-               Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-               Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-               gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-               RYmodel= "RY ~ A + M2 + L2", 
-               Ymodel="Y ~ A + M2 + L2", 
-               QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+               Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
+               Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+               gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+               RYmodel = "RY ~ A + M2 + L2", 
+               Ymodel = "Y ~ A + M2 + L2", 
+               QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
                a1 = 1, a0 = 0, n_bins = 40)
 fit$est
 ```
 
-Nuisance parameters can be modeled with any machine learning algorithm supported by sl3 R package
+Nuisance parameters can be modeled with any machine learning algorithm supported by the [<tt>`sl3`</tt>](https://github.com/tlverse/sl3) R package
 
 ```{r echo = TRUE, eval = TRUE}
 lrn_stack <- Stack$new(Lrnr_glm_fast$new(), Lrnr_mean$new(), Lrnr_bayesglm$new(), 
@@ -64,16 +64,16 @@ lrn_sl <- Lrnr_sl$new(learners = lrn_stack)
 ```
 
 ```{r echo = TRUE, eval = TRUE}
-fitSL <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
+fitSL <-fitLTMLE(data, t = c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                 RYmodel= "RY ~ A + M2 + L2", 
-                 Ymodel="Y ~ A + M2 + L2", 
-                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+                 Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
+                 Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                 gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                 RYmodel = "RY ~ A + M2 + L2", 
+                 Ymodel = "Y ~ A + M2 + L2", 
+                 QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
                  a1 = 1, a0 = 0, n_bins = 40,
-                 Ylearner=lrn_sl, RYlearner = lrn_sl, Clearner = lrn_sl)
+                 Ylearner = lrn_sl, RYlearner = lrn_sl, Clearner = lrn_sl)
 fitSL$est
 ```
 
@@ -85,3 +85,4 @@ Our simulations studies are organized with the help of the targets package (see 
 
 ```
 
+## References
