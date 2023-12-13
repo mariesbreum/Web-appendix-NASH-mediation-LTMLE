@@ -5,7 +5,6 @@
 # This function returns targeted estimates of the direct and indirect effects. 
 #
 fitLTMLE <- function(data, # data table or data frame 
-                     t, # numeric vector (analysis visits)
                      L0nodes, # character vector (baseline covariates)
                      Anode, # character (baseline treatment variable)
                      Cnodes, # char vector (censoring variables)
@@ -21,14 +20,14 @@ fitLTMLE <- function(data, # data table or data frame
                      QLmodel, # model for initial regression QL
                      a1, # level of treatment var corresponding to a1
                      a0, # level of treatment var corresponding to a0
-                     n_bins, # number of partitions used for the numerical integration
+                     pi = NULL, # if NULL the propensity score is estimated from the data
+                     n_bins = 40, # number of partitions used for the numerical integration
                      Ylearner = NULL,
                      RYlearner = NULL,
                      Mlearner = NULL,
                      glearner = NULL,
                      QLlearner = NULL,
                      Clearner = NULL,
-                     pi=NULL,
                      alpha = 0.00001 # truncation (alpha, 1-alpha) used to bound Q_Y away from 1 and 0
                      
 ){
@@ -37,7 +36,7 @@ fitLTMLE <- function(data, # data table or data frame
   data <- data.table::copy(data)[,..cols]
   
   # set-up 
-  K <- length(t)
+  K <- length(Mnodes)
   n <- nrow(data)
   
   if(is.null(pi)){
@@ -89,7 +88,7 @@ fitLTMLE <- function(data, # data table or data frame
   })
   
   # compute weights/clever covariates
-  data <- cbind(data, fitInitial(data, t, Anode, Cnodes, Mnodes, RYnode, Cmodel, gmodel, RYmodel, a1, a0,
+  data <- cbind(data, fitInitial(data, Anode, Cnodes, Mnodes, RYnode, Cmodel, gmodel, RYmodel, a1, a0,
                                  Clearner, RYlearner, glearner, Mlearner, fitg, fitM, pi))
   
   # fit initial Y model
@@ -335,16 +334,16 @@ fitLTMLE <- function(data, # data table or data frame
   psi.a1.ga0.var <-data[, var(eif.a1.ga0)/n]
   psi.a0.ga0.var <-data[, var(eif.a0.ga0)/n]
   
-  est <- data.table("sde"=sde, "sdevar"=sdevar,
-                    "sie"=sie, "sievar"=sievar,
-                    "oe"=oe, "oevar"=oevar, 
-                    "psi11"=psi.a1.ga1, "psi11var"=psi.a1.ga1.var,
-                    "psi10"=psi.a1.ga0, "psi10var"=psi.a1.ga0.var,
-                    "psi00"=psi.a0.ga0, "psi00var"=psi.a0.ga0.var)
   
-  est <- data.table("par" = c("sde", "sie", "oe", "psi11", "psi10", "psi00"),
-                    "est" = c(sde, sie, oe, psi.a1.ga1, psi.a1.ga0, psi.a0.ga0),
-                    "var" = c(sdevar, sievar, oevar, psi.a1.ga1.var, psi.a1.ga0.var, psi.a0.ga0.var))
+  est <- data.table("estimand" = c("sde", "sie", "oe"),
+                    "est" = c(sde, sie, oe),
+                    "se" = c(sqrt(sdevar), sqrt(sievar), sqrt(oevar)),
+                    "CI.low" = c(sde-qnorm(0.975)*sqrt(sdevar), sie-qnorm(0.975)*sqrt(sievar), oe-qnorm(0.975)*sqrt(oevar)),
+                    "CI.up" = c(sde+qnorm(0.975)*sqrt(sdevar), sie+qnorm(0.975)*sqrt(sievar), oe+qnorm(0.975)*sqrt(oevar)))
+  
+  est.psi <- data.table("estimand" = c("psi11", "psi10", "psi00"),
+                        "est" = c(psi.a1.ga1, psi.a1.ga0, psi.a0.ga0),
+                        "var" = c(psi.a1.ga1.var, psi.a1.ga0.var, psi.a0.ga0.var))
   
   
   if(is.null(glearner)){

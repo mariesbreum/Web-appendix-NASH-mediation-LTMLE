@@ -1,7 +1,6 @@
 ---
 output: github_document
 ---
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
@@ -17,11 +16,21 @@ library(knitr)
 
 # Estimation of data-dependent (in)direct effects with a repeatedly measured continuous mediator and missing outcome data
 
-## Introduction
+## Introduction <a name="introduction"></a>
 Here we provide the R-code to reproduce the simulation study presented in our manuscript.
 
 
-## Preparation
+## Overview
+* [Preparation](#preparation)
+* [Example](#example)
+  1. [Data adaptive estimation](#dataadaptive)
+* [Simulation study](#simulations)
+  1. [Table 1](#table1)
+  2. [Table 2](#table2)
+  3. [Table D1](#tableD1)
+
+
+## Preparation <a name="preparation"></a>
 Clone the github repository, then load (and install first if necessary) the following packages
 ```{r, eval=TRUE, echo=TRUE, message=FALSE, warning=FALSE}
 library(data.table)
@@ -35,27 +44,33 @@ for(f in list.files("functions",".R$",full.names=TRUE)){source(f)}
 ```
 
 
-## Example
+## Example <a name="example"></a>
 
+To illustrate how the implementation works we generate a simulated data set from the data generating mechanism described in the manuscript. 
 ```{r echo = TRUE, eval = TRUE}
+set.seed(67394)
 data <- simulateData(n=500)
 ```
 
+The estimates are computed using the <tt>`fitLTMLE`</tt> function 
+```{r echo = TRUE, eval = TRUE}
+fit <- fitLTMLE(data, L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
+                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
+                Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
+                Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                RYmodel = "RY ~ A + M2 + L2", 
+                Ymodel = "Y ~ A + M2 + L2", 
+                QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+                a1 = 1, a0 = 0)
+```
 
 ```{r echo = TRUE, eval = TRUE}
-fit <-fitLTMLE(data, t = c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-               Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-               Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
-               Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-               gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-               RYmodel = "RY ~ A + M2 + L2", 
-               Ymodel = "Y ~ A + M2 + L2", 
-               QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-               a1 = 1, a0 = 0, n_bins = 40)
 fit$est
 ```
 
-Nuisance parameters can be modeled with any machine learning algorithm supported by the [<tt>`sl3`</tt>](https://github.com/tlverse/sl3) R package
+### Data adaptive estimation <a name="dataadaptive"></a>
+Nuisance parameters can be modeled with any machine learning algorithm supported by the [<tt>`sl3`</tt>](https://github.com/tlverse/sl3) R package. To illustrate this we define a Super Learner 
 
 ```{r echo = TRUE, eval = TRUE}
 lrn_stack <- Stack$new(Lrnr_glm_fast$new(), Lrnr_mean$new(), Lrnr_bayesglm$new(), 
@@ -63,26 +78,31 @@ lrn_stack <- Stack$new(Lrnr_glm_fast$new(), Lrnr_mean$new(), Lrnr_bayesglm$new()
 lrn_sl <- Lrnr_sl$new(learners = lrn_stack)
 ```
 
+The estimates are computed as follows
 ```{r echo = TRUE, eval = TRUE}
-fitSL <-fitLTMLE(data, t = c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                 Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
-                 Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                 gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                 RYmodel = "RY ~ A + M2 + L2", 
-                 Ymodel = "Y ~ A + M2 + L2", 
-                 QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                 a1 = 1, a0 = 0, n_bins = 40,
-                 Ylearner = lrn_sl, RYlearner = lrn_sl, Clearner = lrn_sl)
+fitSL <- fitLTMLE(data, L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
+                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
+                  Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
+                  Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                  gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                  RYmodel = "RY ~ A + M2 + L2", 
+                  Ymodel = "Y ~ A + M2 + L2", 
+                  QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+                  a1 = 1, a0 = 0, Ylearner = lrn_sl, RYlearner = lrn_sl, Clearner = lrn_sl)
+```
+```{r echo = TRUE, eval = TRUE}
 fitSL$est
 ```
 
 
-## Simulation study
-Our simulations studies are organized with the help of the targets package (see https://books.ropensci.org/targets/). The simulation set-up is defined in the master file ./_targets.R. The results can be assessed by the function tar_read() as shown below.
+## Simulation study <a name="simulations"></a>
+Our simulations studies are organized with the help of the R package [<tt>`targets`</tt>](https://books.ropensci.org/targets/). The simulation set-up is defined in the master file ./_targets.R. The results can be assessed by the function tar_read() as shown below.
 
+### Table 1 <a name="table1"></a>
 ```{r}
 
 ```
 
-## References
+### Table 2 <a name="table2"></a>
+
+### Table D1 <a name="tableD1"></a>

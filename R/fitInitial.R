@@ -6,7 +6,6 @@
 # the ltmle algorithm. 
 # 
 fitInitial <- function(data,  # data table or data frame
-                       t, # numeric vector (analysis visits)
                        Anode, # character (baseline treatment variable)
                        Cnodes,# char vector (censoring variables)
                        Mnodes, # char (outcome)
@@ -26,7 +25,7 @@ fitInitial <- function(data,  # data table or data frame
 ){
   
   data <- copy(data)
-  K <- length(t)
+  K <- length(Mnodes)
   n <- nrow(data)
   
   # Compute fitted values delta_k
