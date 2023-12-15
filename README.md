@@ -12,7 +12,8 @@ in our manuscript.
 
 - [Preparation](#preparation)
 - [Example](#example)
-  1.  [Data adaptive estimation](#dataadaptive)
+  1.  [Simple example](#simplexample)
+  2.  [Data adaptive estimation](#dataadaptive)
 - [Simulation study](#simulations)
   1.  [Table 1](#table1)
   2.  [Table 2](#table2)
@@ -36,6 +37,8 @@ for(f in list.files("functions",".R$",full.names=TRUE)){source(f)}
 ```
 
 ## Example <a name="example"></a>
+
+### Simple example <a name="simpleexample"></a>
 
 To illustrate how the implementation works we generate a simulated data
 set from the data generating mechanism described in the manuscript.

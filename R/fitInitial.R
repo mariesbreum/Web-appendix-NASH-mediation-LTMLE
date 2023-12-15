@@ -21,7 +21,7 @@ fitInitial <- function(data,  # data table or data frame
                        Mlearner,
                        fitg, # fitted model g
                        fitM, # fitted model M
-                       pi # estimated propensity score
+                       pi # propensity score
 ){
   
   data <- copy(data)
