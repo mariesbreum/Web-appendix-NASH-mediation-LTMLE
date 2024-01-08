@@ -1,0 +1,15 @@
+name|type|parent|branches|progress
+table1_batch|stem|table1_batch|0|skipped
+tableD2_batch|stem|tableD2_batch|0|started
+tableD2_batch|stem|tableD2_batch|0|built
+table2_batch|stem|table2_batch|0|skipped
+table1_8de6c105|pattern|table1_8de6c105|1|started
+table1_8de6c105_6a33d72d|branch|table1_8de6c105|0|started
+table1_8de6c105_6a33d72d|branch|table1_8de6c105|0|built
+table1_8de6c105|pattern|table1_8de6c105|1|built
+table1_05012345|pattern|table1_05012345|1|started
+table1_05012345_6a33d72d|branch|table1_05012345|0|started
+table1_05012345_6a33d72d|branch|table1_05012345|0|built
+table1_05012345|pattern|table1_05012345|1|built
+table1_069345be|pattern|table1_069345be|1|started
+table1_069345be_6a33d72d|branch|table1_069345be|0|started

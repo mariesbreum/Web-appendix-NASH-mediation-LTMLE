@@ -21,7 +21,7 @@ fitLTMLE <- function(data, # data table or data frame
                      a1, # level of treatment var corresponding to a1
                      a0, # level of treatment var corresponding to a0
                      pi = NULL, # if NULL the propensity score is estimated from the data
-                     n_bins = 40, # number of partitions used for the numerical integration
+                     n_bins = 50, # number of partitions used for the numerical integration
                      Ylearner = NULL,
                      RYlearner = NULL,
                      Mlearner = NULL,
@@ -44,14 +44,7 @@ fitLTMLE <- function(data, # data table or data frame
   }
   
   if(is.null(QLlearner)){
-    #stack <- sl3::Stack$new(Lrnr_glm_fast$new(), Lrnr_mean$new(), Lrnr_bayesglm$new(), 
-    #                        Lrnr_gam$new(), Lrnr_caret$new(algorithm  = "glmStepAIC", trace=F))
-    #corP_screen <- sl3::Lrnr_screener_correlation$new(type = "threshold", pvalue_threshold = 0.05, min_screen = 1)
-    #lrn_QL <- sl3::Lrnr_sl$new(learners = Stack$new(stack, Pipeline$new(corP_screen, stack)))
-    lrn_QL <- sl3::Lrnr_glm$new(family=quasibinomial())
-  }
-  else{
-    lrn_QL <- QLlearner
+    QLlearner <- sl3::Lrnr_glm$new(family=quasibinomial())
   }
 
   suppressMessages({
@@ -90,7 +83,8 @@ fitLTMLE <- function(data, # data table or data frame
   # compute weights/clever covariates
   data <- cbind(data, fitInitial(data, Anode, Cnodes, Mnodes, RYnode, Cmodel, gmodel, RYmodel, a1, a0,
                                  Clearner, RYlearner, glearner, Mlearner, fitg, fitM, pi))
-  
+
+
   # fit initial Y model
   if(is.null(Ylearner)){
     fitY <- glm(Ymodel, data = data[data[[RYnode]]==1,], family="binomial")
@@ -182,11 +176,11 @@ fitLTMLE <- function(data, # data table or data frame
     ### Compute QL_k+1_star ###
     
     # fit initial QL_k+1
-    fitL.a1.ga1 <- lrn_QL$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
+    fitL.a1.ga1 <- QLlearner$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
                                           paste0("QM_",K-k+1, ".a1.ga1~",QLcov[K-k+1])))
-    fitL.a1.ga0 <- lrn_QL$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
+    fitL.a1.ga0 <- QLlearner$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
                                           paste0("QM_",K-k+1, ".a1.ga0~",QLcov[K-k+1])))
-    fitL.a0.ga0 <- lrn_QL$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
+    fitL.a0.ga0 <- QLlearner$train(make_task(data[data[[Cnodes[K-k+1]]]==0,], 
                                           paste0("QM_",K-k+1, ".a0.ga0~",QLcov[K-k+1])))
     
     # initial predictions QL_k+1
@@ -270,9 +264,9 @@ fitLTMLE <- function(data, # data table or data frame
   ### Compute QL_1_star ###
   
   # fit initial QL_1
-  fitL.a1.ga1 <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a1.ga1", "~",QLcov[1])))
-  fitL.a1.ga0 <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a1.ga0", "~",QLcov[1])))
-  fitL.a0.ga0 <- lrn_QL$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a0.ga0", "~",QLcov[1])))
+  fitL.a1.ga1 <- QLlearner$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a1.ga1", "~",QLcov[1])))
+  fitL.a1.ga0 <- QLlearner$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a1.ga0", "~",QLcov[1])))
+  fitL.a0.ga0 <- QLlearner$train(make_task(data[data[[Cnodes[1]]]==0,], paste0("QM_1.a0.ga0", "~",QLcov[1])))
 
   # initial predictions QL_1
   newcols <- c("QM_1.a1.ga1", "QM_1.a1.ga0", "QM_1.a0.ga0")
@@ -321,37 +315,46 @@ fitLTMLE <- function(data, # data table or data frame
   }
   
   ### Estimands ###
-  sde <- data[, mean(QL_1.a1.ga0.star)-mean(QL_1.a0.ga0.star)] 
-  sie <- data[, mean(QL_1.a1.ga1.star)-mean(QL_1.a1.ga0.star)] 
-  oe <- data[, mean(QL_1.a1.ga1.star)-mean(QL_1.a0.ga0.star)]
   psi.a1.ga1 <-data[, mean(QL_1.a1.ga1.star)]
   psi.a1.ga0 <-data[, mean(QL_1.a1.ga0.star)]
   psi.a0.ga0 <-data[, mean(QL_1.a0.ga0.star)]
-  sdevar <- data[, var(eif.a1.ga0 - eif.a0.ga0)/n]
-  sievar <- data[, var(eif.a1.ga1 - eif.a1.ga0)/n]
-  oevar <- data[, var(eif.a1.ga1 - eif.a0.ga0)/n]
-  psi.a1.ga1.var <-data[, var(eif.a1.ga1)/n]
-  psi.a1.ga0.var <-data[, var(eif.a1.ga0)/n]
-  psi.a0.ga0.var <-data[, var(eif.a0.ga0)/n]
+
+  est.psi <- data.frame(est.psi11=psi.a1.ga1, est.psi10=psi.a1.ga0, est.psi00=psi.a0.ga0, 
+                        se.psi11=data[, sd(eif.a1.ga1)/sqrt(n)], se.psi10=data[, sd(eif.a1.ga0)/sqrt(n)], 
+                        se.psi00=data[, sd(eif.a0.ga0)/sqrt(n)])
+    
+  est.diff <- data.frame(est.sde=psi.a1.ga0-psi.a0.ga0, est.sie=psi.a1.ga1-psi.a1.ga0, est.oe=psi.a1.ga1-psi.a0.ga0, 
+                         se.sde=data[, sd(eif.a1.ga0 - eif.a0.ga0)/sqrt(n)], se.sie=data[, sd(eif.a1.ga1 - eif.a1.ga0)/sqrt(n)], 
+                         se.oe=data[, sd(eif.a1.ga1 - eif.a0.ga0)/sqrt(n)])
+  
+  est.prop <- data.frame(est.propsde = (psi.a1.ga0-psi.a0.ga0)/(psi.a1.ga1-psi.a0.ga0), est.propsie = (psi.a1.ga1-psi.a1.ga0)/(psi.a1.ga1-psi.a0.ga0), 
+                       se.propsde = data[, sd(((eif.a1.ga0 - eif.a0.ga0)*(psi.a1.ga1-psi.a0.ga0) - 
+                                               (psi.a1.ga0-psi.a0.ga0)*(eif.a1.ga1 - eif.a0.ga0))/(psi.a1.ga1-psi.a0.ga0)^2)/sqrt(n)], 
+                       se.propsie = data[, sd(((eif.a1.ga1 - eif.a1.ga0)*(psi.a1.ga1-psi.a0.ga0) -
+                                               (psi.a1.ga1-psi.a1.ga0)*(eif.a1.ga1 - eif.a0.ga0))/(psi.a1.ga1-psi.a0.ga0)^2)/sqrt(n)])
   
   
-  est <- data.table("estimand" = c("sde", "sie", "oe"),
-                    "est" = c(sde, sie, oe),
-                    "se" = c(sqrt(sdevar), sqrt(sievar), sqrt(oevar)),
-                    "CI.low" = c(sde-qnorm(0.975)*sqrt(sdevar), sie-qnorm(0.975)*sqrt(sievar), oe-qnorm(0.975)*sqrt(oevar)),
-                    "CI.up" = c(sde+qnorm(0.975)*sqrt(sdevar), sie+qnorm(0.975)*sqrt(sievar), oe+qnorm(0.975)*sqrt(oevar)))
+  est.OR <- data.frame(est.ORsde = (psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0)), 
+                       est.ORsie = (psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a1.ga0/(1-psi.a1.ga0)), 
+                       est.ORoe = (psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0)), 
+                       se.ORsde = data[, sd((1-psi.a0.ga0)/((1-psi.a1.ga0)^2*psi.a0.ga0)*eif.a1.ga0 -
+                                             psi.a1.ga0/((1-psi.a0.ga0)*psi.a1.ga0^2)*eif.a0.ga0)/sqrt(n)], 
+                       se.ORsie=data[, sd((1-psi.a1.ga0)/((1-psi.a1.ga1)^2*psi.a1.ga0)*eif.a1.ga1 -
+                                            psi.a1.ga1/((1-psi.a1.ga0)*psi.a1.ga1^2)*eif.a1.ga0)/sqrt(n)], 
+                       se.ORoe=data[, sd((1-psi.a0.ga0)/((1-psi.a1.ga1)^2*psi.a0.ga0)*eif.a1.ga1 -
+                                           psi.a1.ga1/((1-psi.a0.ga0)*psi.a1.ga1^2)*eif.a0.ga0)/sqrt(n)])
   
-  est.psi <- data.table("estimand" = c("psi11", "psi10", "psi00"),
-                        "est" = c(psi.a1.ga1, psi.a1.ga0, psi.a0.ga0),
-                        "var" = c(psi.a1.ga1.var, psi.a1.ga0.var, psi.a0.ga0.var))
-  
+  est.all <- cbind(est.diff, est.psi, est.prop, est.OR)
   
   if(is.null(glearner)){
-    out <- list(est=est, fitg=fitg, pi=pi) 
+    out <- list(est.diff=est.diff, est.prop=est.prop, est.OR=est.OR, est.psi=est.psi, est.all=est.all,fitg=fitg, pi=pi) 
   }
   else{
-    out <- est
+    out <- list(est.diff=est.diff, est.prop=est.prop, est.OR=est.OR, est.psi=est.psi, est.all=est.all, pi=pi) 
   }
+  
+  class(out) <- "fitLTMLE"
+  
   return(out)
 }  
 

@@ -25,39 +25,31 @@ fitInitial <- function(data,  # data table or data frame
 ){
   
   data <- copy(data)
+  
+  # set-up
   K <- length(Mnodes)
   n <- nrow(data)
   
-  # Compute fitted values delta_k
   if(is.null(Clearner)){
-    data[, paste0("pC.",1) := 1 - predict(glm(Cmodel[[1]], data=data, family="binomial"), type="response")]
-    for(i in 2:K){
-      set(data, i=which(data[[Cnodes[i-1]]]==0), j=paste0("pC.",i), value = 
-            1-predict(glm(Cmodel[[i]], data=data[data[[Cnodes[i-1]]]==0,], family="binomial"), type="response"))
-    }
+    Clearner <- Lrnr_glm$new()
   }
-  else{
-    data[, paste0("pC.",1) := 1 - Clearner$train(make_task(data, Cmodel[[1]]))$predict()]
-    for(i in 2:K){
-      set(data, i=which(data[[Cnodes[i-1]]]==0), j=paste0("pC.",i), value = 
-            1-Clearner$train(make_task(data[data[[Cnodes[i-1]]]==0,], Cmodel[[i]]))$predict()) 
-    }
+  if(is.null(RYlearner)){
+    RYlearner <- Lrnr_glm$new()
   }
   
-  # Compute fitted values p_RY
-  if(is.null(RYlearner)){
-    data[data[[Cnodes[K]]]==0, pRY:= predict(glm(RYmodel, data=data[data[[Cnodes[K]]]==0, ], family="binomial"), type="response")]
+  # Compute pC
+  data[, paste0("pC.",1) := 1 - Clearner$train(make_task(data, Cmodel[[1]]))$predict()]
+  for(i in 2:K){
+    set(data, i=which(data[[Cnodes[i-1]]]==0), j=paste0("pC.",i), value = 
+          1-Clearner$train(make_task(data[data[[Cnodes[i-1]]]==0,], Cmodel[[i]]))$predict()) 
   }
-  else{
-    data[data[[Cnodes[K]]]==0, pRY:= RYlearner$train(make_task(data[data[[Cnodes[K]]]==0, ], RYmodel))$predict()]
-  }
-
+  
   # Compute fitted values pM and G
   nd.a1 <- copy(data)[data[[Anode]]!=a1, paste0(Anode):=paste0(a1)]
   nd.a0 <- copy(data)[data[[Anode]]!=a0, paste0(Anode):=paste0(a0)]
   
-  if(is.null(Mlearner)){
-    for(k in 1:K){
+  for(k in 1:K){
+    if(is.null(Mlearner)){
       mu.m <- predict(fitM[[k]])
       data[data[[Cnodes[k]]]==0, paste0("pM.", k) := dnorm(data[data[[Cnodes[k]]]==0][[Mnodes[k]]], 
                                                                mean=mu.m, sd=sd(fitM[[k]]$residuals))]
@@ -68,9 +60,7 @@ fitInitial <- function(data,  # data table or data frame
       data[data[[Cnodes[k]]]==0, paste0("g.a0.", k) := dnorm(data[data[[Cnodes[k]]]==0][[Mnodes[k]]], 
                                                              mean=mu.g.a0, sd=sd(fitg[[k]]$residuals))]
     }
-  }
-  else{
-    for(k in 1:K){
+    else{
       data[data[[Cnodes[k]]]==0, paste0("pM.", k) := fitM[[k]]$predict()]
       data[data[[Cnodes[k]]]==0, paste0("g.a1.", k) := fitg[[k]]$predict(make_task(nd.a1[nd.a1[[Cnodes[k]]]==0,], gmodel[[k]]))]
       data[data[[Cnodes[k]]]==0, paste0("g.a0.", k) := fitg[[k]]$predict(make_task(nd.a0[nd.a0[[Cnodes[k]]]==0,], gmodel[[k]]))]
@@ -84,7 +74,6 @@ fitInitial <- function(data,  # data table or data frame
         (1*(data[[Anode]]==a1 & data[[Cnodes[1]]]==0)/data[[paste0("pC.", 1)]]))
   set(data, j=paste0("H.a0.ga0.", 1), value = (1/(1-pi)) * 
         (1*(data[[Anode]]==a0 & data[[Cnodes[1]]]==0)/data[[paste0("pC.", 1)]]))
-
   
   for(i in 2:K){
     set(data, j = paste0("H.a1.ga1.", i), value = data[[paste0("H.a1.ga1.", i-1)]]*
@@ -98,6 +87,10 @@ fitInitial <- function(data,  # data table or data frame
           (data[[paste0("g.a0.", i-1)]]/data[[paste0("pM.", i-1)]]))
   }
   
+  # Compute fitted values p_RY
+  data[data[[Cnodes[K]]]==0, pRY:= RYlearner$train(make_task(data[data[[Cnodes[K]]]==0, ], RYmodel))$predict()]
+  
+  # Compute weights H_K+1
   set(data, j = paste0("H.a1.ga1.", K+1), value = data[[paste0("H.a1.ga1.", K)]] * 
         (1*(data[[RYnode]]==1)/data[["pRY"]])* 
           (data[[paste0("g.a1.", K)]]/data[[paste0("pM.", K)]]))

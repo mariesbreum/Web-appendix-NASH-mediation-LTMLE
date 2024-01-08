@@ -1,4 +1,4 @@
-setwd("/Users/mariebreum/Documents/GitHub/NASH-mediation")# ---------------------------------------------------------------------
+setwd("~/GitHub/NASH-mediation")
 # packages
 # ---------------------------------------------------------------------
 library(targets)
@@ -10,309 +10,74 @@ targets::tar_option_set(packages = thepackages)
 # R functions
 # ---------------------------------------------------------------------
 tar_source(files=c("R", "functions"))
-
 # ---------------------------------------------------------------------
-# Settings
+# Simulation settings
 # ---------------------------------------------------------------------
-# tar_make_clustermq() configuration (okay to leave alone):
-# options(clustermq.scheduler = "multiprocess")
-# tar_make_future() configuration (okay to leave alone):
-# Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
-
+source("./settings/simulation_settings.R")
 # ---------------------------------------------------------------------
 # The target flow
 # ---------------------------------------------------------------------
-
 list(
-  tar_rep(res_n400_bins,
-          command={
-            data <- simulateData(400);
-            fit_bin10 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 10);
-            fit_bin20 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 20);
-            fit_bin40 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                           Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                           Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                           Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                           gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                           RYmodel= "RY ~ A + M2 + L2", 
-                           Ymodel="Y ~ A + M2 + L2", 
-                           QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                           a1 = 1, a0 = 0, n_bins = 40);
-            fit_bin80 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 80);
-            fit_bin160 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 160);
-            trueVal <- theTruth(n=10^6,coefM1 = fit_bin40$fitg[[1]]$coefficients, coefM2 = fit_bin40$fitg[[2]]$coefficients,
-                                sdM1 =sd(fit_bin40$fitg[[1]]$residuals) , sdM2 = sd(fit_bin40$fitg[[2]]$residuals))
-            rbind(cbind(bins=10, fit_bin10$est, trueVal),
-                  cbind(bins=20, fit_bin20$est, trueVal),
-                  cbind(bins=40, fit_bin40$est, trueVal),
-                  cbind(bins=80, fit_bin80$est, trueVal),
-                  cbind(bins=160, fit_bin160$est, trueVal))
-          },
-          reps=1000),
-  tar_rep(res_n4000_bins,
-          command={
-            data <- simulateData(4000);
-            fit_bin10 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                  Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                  Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                  gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                  RYmodel= "RY ~ A + M2 + L2", 
-                                  Ymodel="Y ~ A + M2 + L2", 
-                                  QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                  a1 = 1, a0 = 0, n_bins = 10);
-            fit_bin20 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 20);
-            fit_bin40 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 40);
-            fit_bin80 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 80);
-            fit_bin160 <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                  Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                  Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                  gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                  RYmodel= "RY ~ A + M2 + L2", 
-                                  Ymodel="Y ~ A + M2 + L2", 
-                                  QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                  a1 = 1, a0 = 0, n_bins = 160);
-            trueVal <- theTruth(n=10^6,coefM1 = fit_bin40$fitg[[1]]$coefficients, coefM2 = fit_bin40$fitg[[2]]$coefficients,
-                                sdM1 =sd(fit_bin40$fitg[[1]]$residuals) , sdM2 = sd(fit_bin40$fitg[[2]]$residuals))
-            rbind(cbind(bins=10, fit_bin10$est, trueVal),
-                  cbind(bins=20, fit_bin20$est, trueVal),
-                  cbind(bins=40, fit_bin40$est, trueVal),
-                  cbind(bins=80, fit_bin80$est, trueVal),
-                  cbind(bins=160, fit_bin160$est, trueVal))
-          },
-          reps=1000),
-  tar_rep(res_n4000_mis,
-          command={
-            data <- simulateData(4000);
-            fit_misC <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 50);
-            fit_misRY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ 1", 
-                                 Ymodel="Y ~ A + M2  + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 50);
-            fit_misY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 50);
-            fit_misQL <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ A", "QL2 ~ A"),
-                                 a1 = 1, a0 = 0, n_bins = 50);
-            fit_misM <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                  Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                  Mmodel=list("M1 ~ A", "M2 ~ A"),
-                                  gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                  RYmodel= "RY ~ A + M2 + L2", 
-                                  Ymodel="Y ~ A + M2 + L2", 
-                                  QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                  a1 = 1, a0 = 0, n_bins = 50);
-            fit_misYQL <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A", 
-                                 QLmodel= list("QL1 ~ A", "QL2 ~ A"),
-                                 a1 = 1, a0 = 0, n_bins = 50);
-            fit_misCMRY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                  Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
-                                  Mmodel=list("M1 ~ A", "M2 ~ A"),
-                                  gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                  RYmodel= "RY ~ 1", 
-                                  Ymodel="Y ~ A + M2 + L2", 
-                                  QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                  a1 = 1, a0 = 0, n_bins = 50);
-            fit_misCMY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                  Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
-                                  Mmodel=list("M1 ~ A", "M2 ~ A"),
-                                  gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                  RYmodel= "RY ~ A + M2 + L2", 
-                                  Ymodel="Y ~ A", 
-                                  QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                  a1 = 1, a0 = 0, n_bins = 50);
-            trueVal <- theTruth(n=10^6,coefM1 = fit_misC$fitg[[1]]$coefficients, coefM2 = fit_misC$fitg[[2]]$coefficients,
-                                sdM1 =sd(fit_misC$fitg[[1]]$residuals) , sdM2 = sd(fit_misC$fitg[[2]]$residuals))
-            rbind(cbind(mis="C", fit_misC$est, trueVal),
-                  cbind(mis="RY", fit_misRY$est, trueVal),
-                  cbind(mis="Y", fit_misY$est, trueVal),
-                  cbind(mis="QL", fit_misQL$est, trueVal),
-                  cbind(mis="M", fit_misM$est, trueVal),
-                  cbind(mis="YQL", fit_misYQL$est, trueVal),
-                  cbind(mis="fit_misCMRY", fit_misCMRY$est, trueVal),
-                  cbind(mis="fit_misCMY", fit_misCMY$est, trueVal))
-          },
-          reps=1000),
-  tar_rep(res_n400_mis,
-          command={
-            data <- simulateData(400);
-            fit_misC <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
-                                Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                RYmodel= "RY ~ A + M2 + L2", 
-                                Ymodel="Y ~ A + M2 + L2", 
-                                QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                a1 = 1, a0 = 0, n_bins = 50);
-            fit_misRY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ 1", 
-                                 Ymodel="Y ~ A + M2  + L2", 
-                                 QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                 a1 = 1, a0 = 0, n_bins = 50);
-            fit_misY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                RYmodel= "RY ~ A + M2 + L2", 
-                                Ymodel="Y ~ A", 
-                                QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                a1 = 1, a0 = 0, n_bins = 50);
-            fit_misQL <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                 Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                 Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                 Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                 gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                 RYmodel= "RY ~ A + M2 + L2", 
-                                 Ymodel="Y ~ A + M2 + L2", 
-                                 QLmodel= list("QL1 ~ A", "QL2 ~ A"),
-                                 a1 = 1, a0 = 0, n_bins = 50);
-            fit_misM <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                Mmodel=list("M1 ~ A", "M2 ~ A"),
-                                gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                RYmodel= "RY ~ A + M2 + L2", 
-                                Ymodel="Y ~ A + M2 + L2", 
-                                QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                a1 = 1, a0 = 0, n_bins = 50);
-            fit_misYQL <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                  Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
-                                  Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                                  gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                  RYmodel= "RY ~ A + M2 + L2", 
-                                  Ymodel="Y ~ A", 
-                                  QLmodel= list("QL1 ~ A", "QL2 ~ A"),
-                                  a1 = 1, a0 = 0, n_bins = 50);
-            fit_misCMRY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                   Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                   Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
-                                   Mmodel=list("M1 ~ A", "M2 ~ A"),
-                                   gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                   RYmodel= "RY ~ 1", 
-                                   Ymodel="Y ~ A + M2 + L2", 
-                                   QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                   a1 = 1, a0 = 0, n_bins = 50);
-            fit_misCMY <-fitLTMLE(data, t=c(1,2), L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                                   Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                                   Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
-                                   Mmodel=list("M1 ~ A", "M2 ~ A"),
-                                   gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                                   RYmodel= "RY ~ A + M2 + L2", 
-                                   Ymodel="Y ~ A", 
-                                   QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                                   a1 = 1, a0 = 0, n_bins = 50);
-            trueVal <- theTruth(n=10^6,coefM1 = fit_misC$fitg[[1]]$coefficients, coefM2 = fit_misC$fitg[[2]]$coefficients,
-                                sdM1 =sd(fit_misC$fitg[[1]]$residuals) , sdM2 = sd(fit_misC$fitg[[2]]$residuals))
-            rbind(cbind(mis="C", fit_misC$est, trueVal),
-                  cbind(mis="RY", fit_misRY$est, trueVal),
-                  cbind(mis="Y", fit_misY$est, trueVal),
-                  cbind(mis="QL", fit_misQL$est, trueVal),
-                  cbind(mis="M", fit_misM$est, trueVal),
-                  cbind(mis="YQL", fit_misYQL$est, trueVal),
-                  cbind(mis="fit_misCMRY", fit_misCMRY$est, trueVal),
-                  cbind(mis="fit_misCMY", fit_misCMY$est, trueVal))
-          },
-          reps=1000)
+  tar_map_rep(
+    name = table1,
+    command = {
+      setting <- list(betaL1.A=betaL1.A, betaM1.A=betaM1.A, 
+                      betaL2.A=betaL2.A,betaM2.A=betaM2.A, betaY.A=betaY.A,
+                      betaY.M=betaY.M, betaY.AL=betaY.AL, betaY.L=-betaY.L, alphaY=alphaY)
+      data <- do.call(simulateData, c(list(n=n), setting));
+      fit <- do.call(fitLTMLE, c(nodes, list(data=data, Ymodel=Ymodel, QLmodel=QLmodel,
+                                             Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
+                                             Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                                             gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                                             RYmodel= "RY ~ A + M2 + L2",
+                                             a1=1, a0=0)));
+      trueVal <- do.call(theTruth, c(setting, list(n=10^6, fitg = fit$fitg)))
+      cbind(fit$est.all, trueVal)
+    },
+    values = values_table1,
+    reps = 1000
+  ),
+  tar_map_rep(
+    name = table2,
+    command = {
+      data <- do.call(simulateData, c(list(n=n), setting_ii));
+      fit_mis1 <- do.call(fitLTMLE, c(list(data=data, a1=1, a0=0), nodes, formula_mis1));
+      fit_mis2 <- do.call(fitLTMLE, c(list(data=data, a1=1, a0=0), nodes, formula_mis2));
+      fit_mis3 <- do.call(fitLTMLE, c(list(data=data, a1=1, a0=0), nodes, formula_mis3));
+      trueVal <- do.call(theTruth, c(setting_ii, list(n=10^6, fitg = fit_mis1$fitg)))
+      rbind(cbind(mis="mis1", fit_mis1$est.all, trueVal),
+            cbind(mis="mis2", fit_mis2$est.all, trueVal),
+            cbind(mis="mis3", fit_mis3$est.all, trueVal))
+    },
+    values = tibble::tibble(n=c(400, 4000)),
+    reps = 1000
+  ),
+  #tar_map_rep(
+  #  name = tableD1,
+  #  command = {
+  #    data <- do.call(simulateData, c(list(n=n), setting_ii));
+  #    fit <- do.call(fitLTMLE, c(nodes, formula_correct, list(data=data, a1=1, a0=0, n_bins=nbins)));
+  #    trueVal <- do.call(theTruth, c(setting_ii, list(n=10^6,fitg = fit$fitg)))
+  #    cbind(fit$est.all, trueVal)
+  #  },
+  #  values = tibble::tibble(expand.grid(n=c(400, 4000), 
+  #                                      nbins=c(10, 20, 40, 80, 160))),
+  #  reps = 1000
+  #),
+  tar_map_rep(
+    name = tableD2,
+    command = {
+      setting <- list(betaL1.A=0.75, betaM1.A=betaM1.A, 
+                      betaL2.A=1.00 ,betaM2.A=betaM2.A, betaY.A=0.75,
+                      betaY.M=betaY.M, betaY.AL=0, betaY.L=-0.15, alphaY=-1)
+      data <- do.call(simulateData, c(list(n=n), setting));
+      fit <- do.call(fitLTMLE, c(nodes, formula_correct, list(data=data, a1=1, a0=0)));
+      trueVal <- do.call(theTruth, c(setting, list(n=10^6,fitg = fit$fitg)))
+      cbind(fit$est.all, trueVal)
+    },
+    values = values_tableD2,
+    reps = 1000
+  )
 )
-
 
 

@@ -6,17 +6,29 @@
 #
 theTruth <- function(n,
                      betaL1.A=0.75, 
-                     betaL2.A=1.00, 
+                     betaM1.A=0.75, 
+                     betaL2.A=1.00,
+                     betaM2.A=1.00,
                      betaY.A=0.75, 
                      betaY.M=0.20, 
-                     betaY.AL=0.0,
+                     betaY.AL=0.0, 
                      betaY.L=-0.15,
                      alphaY=-1, 
-                     coefM1,
-                     coefM2,
-                     sdM1,
-                     sdM2
+                     fitg=NULL
 ){
+  
+  if(is.null(fitg)){
+    coefM1 = c(2.3, betaM1.A, -0.2)
+    coefM2 = c(0.5, 0.9, betaM2.A, -0.2)
+    sdM1 = 1
+    sdM2 = 1
+  }
+  else{
+    coefM1 = fitg[[1]]$coefficients 
+    coefM2 = fitg[[2]]$coefficients
+    sdM1 = sd(fitg[[1]]$residuals) 
+    sdM2 = sd(fitg[[2]]$residuals) 
+  }
     
   L01 <- rnorm(n, mean = 4, sd = 1)
   L1.a1 <- rnorm(n, mean = 0.5 + 0.85*L01 + betaL1.A*1 , sd = 1)
@@ -37,14 +49,19 @@ theTruth <- function(n,
   psi11.0 <- mean(Y.a1.a1)
   psi10.0 <- mean(Y.a1.a0)
   psi00.0 <- mean(Y.a0.a0)
-  SDE.0 <- psi10.0-psi00.0
-  SIE.0 <- psi11.0-psi10.0
-  OE.0 <- psi11.0-psi00.0
-  SDE.prop.0 <-SDE.0/OE.0
-  SIE.prop.0 <-SIE.0/OE.0
+  sde.0 <- psi10.0-psi00.0
+  sie.0 <- psi11.0-psi10.0
+  oe.0 <- psi11.0-psi00.0
+  sde.prop.0 <- sde.0/oe.0
+  sie.prop.0 <- sie.0/oe.0
+  sde.OR.0 <- (psi10.0/(1-psi10.0)) / (psi00.0/(1-psi00.0))
+  sie.OR.0 <- (psi11.0/(1-psi11.0)) / (psi10.0/(1-psi10.0))
+  oe.OR.0  <- (psi11.0/(1-psi11.0)) / (psi00.0/(1-psi00.0))
   
   return(data.frame(psi11.true=psi11.0, psi10.true=psi10.0, psi00.true = psi00.0,
-                    sde.true = SDE.0, sie.true = SIE.0, oe.true = OE.0, 
-                    sde.prop.true = SDE.prop.0, sie.prop.true = SIE.prop.0))
+                    sde.true = sde.0, sie.true = sie.0, oe.true = oe.0, 
+                    sde.prop.true = sde.prop.0, sie.prop.true = sie.prop.0,
+                    sde.OR.true = sde.OR.0, sie.OR.true = sie.OR.0, 
+                    oe.OR.true = oe.OR.0))
 }
 
