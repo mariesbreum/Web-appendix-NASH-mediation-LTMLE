@@ -324,33 +324,47 @@ fitLTMLE <- function(data, # data table or data frame
                         se.psi00=data[, sd(eif.a0.ga0)/sqrt(n)])
     
   est.diff <- data.frame(est.sde=psi.a1.ga0-psi.a0.ga0, est.sie=psi.a1.ga1-psi.a1.ga0, est.oe=psi.a1.ga1-psi.a0.ga0, 
+                         est.pm=(psi.a1.ga0-psi.a0.ga0)/(psi.a1.ga1-psi.a0.ga0),
                          se.sde=data[, sd(eif.a1.ga0 - eif.a0.ga0)/sqrt(n)], se.sie=data[, sd(eif.a1.ga1 - eif.a1.ga0)/sqrt(n)], 
-                         se.oe=data[, sd(eif.a1.ga1 - eif.a0.ga0)/sqrt(n)])
-  
-  est.prop <- data.frame(est.propsde = (psi.a1.ga0-psi.a0.ga0)/(psi.a1.ga1-psi.a0.ga0), est.propsie = (psi.a1.ga1-psi.a1.ga0)/(psi.a1.ga1-psi.a0.ga0), 
-                       se.propsde = data[, sd(((eif.a1.ga0 - eif.a0.ga0)*(psi.a1.ga1-psi.a0.ga0) - 
-                                               (psi.a1.ga0-psi.a0.ga0)*(eif.a1.ga1 - eif.a0.ga0))/(psi.a1.ga1-psi.a0.ga0)^2)/sqrt(n)], 
-                       se.propsie = data[, sd(((eif.a1.ga1 - eif.a1.ga0)*(psi.a1.ga1-psi.a0.ga0) -
-                                               (psi.a1.ga1-psi.a1.ga0)*(eif.a1.ga1 - eif.a0.ga0))/(psi.a1.ga1-psi.a0.ga0)^2)/sqrt(n)])
-  
+                         se.oe=data[, sd(eif.a1.ga1 - eif.a0.ga0)/sqrt(n)], 
+                         se.pm=data[, sd(((eif.a1.ga0 - eif.a0.ga0)*(psi.a1.ga1-psi.a0.ga0) - 
+                                            (psi.a1.ga0-psi.a0.ga0)*(eif.a1.ga1 - eif.a0.ga0))/(psi.a1.ga1-psi.a0.ga0)^2)/sqrt(n)])
   
   est.OR <- data.frame(est.ORsde = (psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0)), 
                        est.ORsie = (psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a1.ga0/(1-psi.a1.ga0)), 
                        est.ORoe = (psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0)), 
                        se.ORsde = data[, sd((1-psi.a0.ga0)/((1-psi.a1.ga0)^2*psi.a0.ga0)*eif.a1.ga0 -
-                                             psi.a1.ga0/((1-psi.a0.ga0)*psi.a1.ga0^2)*eif.a0.ga0)/sqrt(n)], 
+                                             psi.a1.ga0/((1-psi.a1.ga0)*psi.a0.ga0^2)*eif.a0.ga0)/sqrt(n)], 
                        se.ORsie=data[, sd((1-psi.a1.ga0)/((1-psi.a1.ga1)^2*psi.a1.ga0)*eif.a1.ga1 -
-                                            psi.a1.ga1/((1-psi.a1.ga0)*psi.a1.ga1^2)*eif.a1.ga0)/sqrt(n)], 
+                                            psi.a1.ga1/((1-psi.a1.ga1)*psi.a1.ga0^2)*eif.a1.ga0)/sqrt(n)], 
                        se.ORoe=data[, sd((1-psi.a0.ga0)/((1-psi.a1.ga1)^2*psi.a0.ga0)*eif.a1.ga1 -
-                                           psi.a1.ga1/((1-psi.a0.ga0)*psi.a1.ga1^2)*eif.a0.ga0)/sqrt(n)])
+                                           psi.a1.ga1/((1-psi.a1.ga1)*psi.a0.ga0^2)*eif.a0.ga0)/sqrt(n)])
   
-  est.all <- cbind(est.diff, est.psi, est.prop, est.OR)
+  
+  est.logOR <- data.frame(est.logORsde = log((psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0))), 
+                          est.logORsie = log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a1.ga0/(1-psi.a1.ga0))), 
+                          est.logORoe = log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0))), 
+                          est.logORpm = log((psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0)))/
+                            log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0))),
+                          se.logORsde = data[, sd(eif.a1.ga0/(psi.a1.ga0*(1-psi.a1.ga0))-
+                                                 eif.a0.ga0/(psi.a0.ga0*(1-psi.a0.ga0)))/sqrt(n)], 
+                          se.logORsie=data[, sd(eif.a1.ga1/(psi.a1.ga1*(1-psi.a1.ga1))-
+                                               eif.a1.ga0/(psi.a1.ga0*(1-psi.a1.ga0)))/sqrt(n)], 
+                          se.logORoe=data[, sd(eif.a1.ga1/(psi.a1.ga1*(1-psi.a1.ga1))-
+                                              eif.a0.ga0/(psi.a0.ga0*(1-psi.a0.ga0)))/sqrt(n)],
+                          se.logORpm=data[, sd((eif.a1.ga0/(psi.a1.ga0*(1-psi.a1.ga0))-eif.a0.ga0/(psi.a0.ga0*(1-psi.a0.ga0)))/
+                                                 log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0))) -
+                                                 ((eif.a1.ga1/(psi.a1.ga1*(1-psi.a1.ga1))-eif.a0.ga0/(psi.a0.ga0*(1-psi.a0.ga0)))*
+                                                    log((psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0))))/
+                                                 (log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0))))^2)/sqrt(n)])
+  
+  est.all <- cbind(est.diff, est.psi, est.OR, est.logOR)
   
   if(is.null(glearner)){
-    out <- list(est.diff=est.diff, est.prop=est.prop, est.OR=est.OR, est.psi=est.psi, est.all=est.all,fitg=fitg, pi=pi) 
+    out <- list(est.diff=est.diff, est.OR=est.OR, est.psi=est.psi, est.logOR=est.logOR, est.all=est.all, fitg=fitg, pi=pi) 
   }
   else{
-    out <- list(est.diff=est.diff, est.prop=est.prop, est.OR=est.OR, est.psi=est.psi, est.all=est.all, pi=pi) 
+    out <- list(est.diff=est.diff, est.OR=est.OR, est.psi=est.psi, est.logOR=est.logOR, est.all=est.all, pi=pi) 
   }
   
   class(out) <- "fitLTMLE"

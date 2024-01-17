@@ -1,17 +1,8 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-fitInitial|function|7e9bf677e3afeffd|||||||||||||||
-fitLTMLE|function|4f4c926f1878650b|||||||||||||||
-formula_correct|object|7015109760f995db|||||||||||||||
-formula_mis1|object|8888ce4f37497051|||||||||||||||
-formula_mis2|object|7a10ab25b8740993|||||||||||||||
-formula_mis3|object|a5560177661d23e3|||||||||||||||
 Lrnr_density_normal|object|2cee7b6e96bbf293|||||||||||||||
-make_prediction_task|function|e0034ad786531407|||||||||||||||
-make_task|function|99b169615325259c|||||||||||||||
 more_results_batch|stem|be28d49a41888700|0bc268ea2d179e02|b5b3f3f1f2ebd7e9|-635005373||t19481.5378148689s|ac45463db19e2cbe|48|rds|local|vector||more_results_batch_ccba877f|0||
 more_results_cb4208dd_0e4c8b52|branch||8b6867484640dc73|04c543338213ebc9|1134049215||t19481.5378419977s||0|rds|local|vector|more_results_cb4208dd||0.06||31mobject must be a data frame.39m
 more_results_f2f9edfd_0e4c8b52|branch||30f29b6c907cca5d|04c543338213ebc9|-222401742||t19481.5685764708s||0|rds|local|vector|more_results_f2f9edfd||2.27|package data.table was built under R version 4.2.3|31mobject must be a data frame.39m
-nodes|object|ffb2fb99f50fa39d|||||||||||||||
 res_n400_bins|pattern|21e4a9d461327533|3254146330179ec2||-2097530625||||664428|rds|local|vector||res_n400_bins_d14cdccc|52525.052||
 res_n400_bins_batch|stem|2b3abef1aad46a69|0bc268ea2d179e02|b5b3f3f1f2ebd7e9|438785150||t19600.8319281978s|ac45463db19e2cbe|48|rds|local|vector||res_n400_bins_batch_ccba877f|0||
 res_n400_bins_d14cdccc|branch|f2ebc13f3c18c4b0|3254146330179ec2|89c2a794e4de1031|-1624127276||t19603.6095849405s|9f68b48eec24e527|664428|rds|local|vector|res_n400_bins||52525.052||
@@ -28,42 +19,39 @@ result|pattern|1f16c442f22cef1d|d69c1199b6691576||1204638111||||346|rds|local|ve
 result_299e96fa|branch|1574f906f3b34960|d69c1199b6691576|a1c9e573dbc861ea|468216299||t19481.5739982267s|7e50109c4a0b197a|346|rds|local|vector|result||298.04||
 result_batch|stem|be28d49a41888700|0bc268ea2d179e02|b5b3f3f1f2ebd7e9|-1842047657||t19481.5450519869s|ac45463db19e2cbe|48|rds|local|vector||result_batch_ccba877f|0||
 result_be353c06|branch|d5458b2f92a4c7a6|de4c6b989fe3b0b3|293170dfd5acbaa9|2063819263||t19481.5428924819s|2721c650416a264a|204|rds|local|vector|result||0.03||
-setting_i|object|d8d53bf4408eadf0|||||||||||||||
-setting_ii|object|ae481c453beb4c77|||||||||||||||
-setting_iii|object|9c4fc4f49ecd2fcc|||||||||||||||
-setting_iv|object|785ce963dd6e43aa|||||||||||||||
 simSimple|function|5f8f4ee0401e5df9|||||||||||||||
-simulateData|function|0a739af0f4e98ee4|||||||||||||||
-summary.fitLTMLE|function|d69f6ae62cd7b55c|||||||||||||||
-table1|stem|625a9558c65d5c92|49ba07c81c8a4c8c|cf95efba304c7820|1895650088||t19730.5231525781s|da072a2de50e7a02|4315|rds|local|group|||0||
-table1_05012345|pattern|88bc37c9625c7909|99691547c44ef791||1483336353||||964|rds|local|vector||table1_05012345_6a33d72d|12.22||
-table1_05012345_6a33d72d|branch|c954acfbbbe0fc83|99691547c44ef791|b78a1de462195305|-1008358222||t19730.5224779521s|787745261bd77bea|964|rds|local|vector|table1_05012345||12.22||
-table1_069345be|pattern|15da51a64ef946a9|15d38ec55a1bf70e||468960024||||978|rds|local|vector||table1_069345be_6a33d72d|7.9||
-table1_069345be_6a33d72d|branch|603d21ecb94c8265|15d38ec55a1bf70e|b78a1de462195305|1907469192||t19730.5225696774s|4942d91646dd93bc|978|rds|local|vector|table1_069345be||7.9||
-table1_069a04c0|pattern|ed29b87a40557884|741a717e0657edd7||1411206915||||966|rds|local|vector||table1_069a04c0_6a33d72d|13.17||
-table1_069a04c0_6a33d72d|branch|940f5c086f9e3c84|741a717e0657edd7|b78a1de462195305|-1450080512||t19730.5227225009s|ab73801c5fe014aa|966|rds|local|vector|table1_069a04c0||13.17||
-table1_8de6c105|pattern|ed51de5f473d9efe|8bdee98379f81969||-474040902||||980|rds|local|vector||table1_8de6c105_6a33d72d|19.06||
-table1_8de6c105_6a33d72d|branch|b62d047a9774213b|8bdee98379f81969|b78a1de462195305|-1291240027||t19730.5223361452s|f0f19eff53e1517a|980|rds|local|vector|table1_8de6c105||19.06|package data.table was built under R version 4.2.3|
-table1_980714c6|pattern|0c46cd6acd39f7be|b0ebbf571e16f494||1436833169||||967|rds|local|vector||table1_980714c6_6a33d72d|7.66||
-table1_980714c6_6a33d72d|branch|e7d0fd6af50fef99|b0ebbf571e16f494|b78a1de462195305|-923654633||t19730.522811405s|5548d6d96e7eff1a|967|rds|local|vector|table1_980714c6||7.66||
-table1_a62892a7|pattern|9b08534821c0c612|2184feaa1602923d||2138454382||||977|rds|local|vector||table1_a62892a7_6a33d72d|8.64||
-table1_a62892a7_6a33d72d|branch|f0bad8dee03332c6|2184feaa1602923d|b78a1de462195305|-558425487||t19730.5229116394s|57e1d1c97dc9f954|977|rds|local|vector|table1_a62892a7||8.64||
+table1|stem|582079d573b265ec|49ba07c81c8a4c8c|a465c302d9b8b636|1895650088||t19737.6010154655s|c78e2877514026dd|1907585|rds|local|group|||0.08||
+table1_05012345|pattern|d7f7fb9bb009ff05|278319800035661e||1483336353||||233610|rds|local|vector||table1_05012345_6a33d72d|7290.76||
+table1_05012345_6a33d72d|branch|977b51b65fa4562c|278319800035661e|f7bae70521854687|-1008358222||t19733.8792573445s|fbba4c82f7f0c8d7|233610|rds|local|vector|table1_05012345||7290.76||
+table1_069345be|pattern|ebdbd519cb92a3cf|627ec22147a1a44f||468960024||||243102|rds|local|vector||table1_069345be_6a33d72d|5318.27||
+table1_069345be_6a33d72d|branch|aabe48ef23d17d87|627ec22147a1a44f|f7bae70521854687|1907469192||t19733.9408121038s|ad64a661e05fd881|243102|rds|local|vector|table1_069345be||5318.27||
+table1_069a04c0|pattern|e3ea60e380a0d97d|52e7e7e39b14ff68||1411206915||||235833|rds|local|vector||table1_069a04c0_6a33d72d|9778.63||
+table1_069a04c0_6a33d72d|branch|93188e52a304a552|52e7e7e39b14ff68|f7bae70521854687|-1450080512||t19734.419298781s|be149626278a4f4d|235833|rds|local|vector|table1_069a04c0||9778.63|package data.table was built under R version 4.2.3|
+table1_8de6c105|pattern|3418f9f18b3aa8cc|2a6e0a2551bac73f||-474040902||||238792|rds|local|vector||table1_8de6c105_6a33d72d|11730.91||
+table1_8de6c105_6a33d72d|branch|1316e8a7bbd24949|2a6e0a2551bac73f|f7bae70521854687|-1291240027||t19733.7948726571s|cbfb3f284611fd63|238792|rds|local|vector|table1_8de6c105||11730.91|package data.table was built under R version 4.2.3|
+table1_980714c6|pattern|daeb6ba994359d4a|fad2a627b63418b8||1436833169||||238993|rds|local|vector||table1_980714c6_6a33d72d|5661.23||
+table1_980714c6_6a33d72d|branch|e62b0939d4728352|fad2a627b63418b8|f7bae70521854687|-923654633||t19734.4848233089s|c46264ee682fde65|238993|rds|local|vector|table1_980714c6||5661.23||
+table1_a62892a7|pattern|520e109473616ff4|5802fa01c9bd35cb||2138454382||||241125|rds|local|vector||table1_a62892a7_6a33d72d|6221.22||
+table1_a62892a7_6a33d72d|branch|447b96c8109ff36f|5802fa01c9bd35cb|f7bae70521854687|-558425487||t19734.5568288658s|b4040c57734c6a87|241125|rds|local|vector|table1_a62892a7||6221.22||
 table1_batch|stem|be28d49a41888700|0bc268ea2d179e02|ef46db3751d8e999|-255190084||t19730.5123533298s|ac45463db19e2cbe|48|rds|local|vector||table1_batch_ccba877f|0||
-table1_e08729d2|pattern|a26421d4cbb3bbe1|49a94d49f910f4ec||-1732709966||||970|rds|local|vector||table1_e08729d2_6a33d72d|12.09||
-table1_e08729d2_6a33d72d|branch|b5df4da27064dc52|49a94d49f910f4ec|b78a1de462195305|-1562460762||t19730.523051776s|09ee093fc9964709|970|rds|local|vector|table1_e08729d2||12.09||
-table1_ed0b91eb|pattern|ef308545f5999a75|7f13c3ef6e1d0984||443003857||||966|rds|local|vector||table1_ed0b91eb_6a33d72d|8.65||
-table1_ed0b91eb_6a33d72d|branch|b89503cdb8b3c83d|7f13c3ef6e1d0984|b78a1de462195305|-1468938208||t19730.5231522062s|ab73801c5fe014aa|966|rds|local|vector|table1_ed0b91eb||8.65||
-table2|stem|6b645b57448134de|e078673379f44c5a|096d419ca3ff966a|-1499021702||t19730.5871928595s|ec99332d5da924c2|2697|rds|local|group|||0.02||
-table2_1df4de6e|pattern|9096b0ba174c54d9|31330ed26369b2c8||1347658465||||1549|rds|local|vector||table2_1df4de6e_7fa84b28|21.75||
-table2_1df4de6e_7fa84b28|branch|80f915ad4e43dca6|31330ed26369b2c8|c15ff61f97790971|-1055308090||t19730.5869366159s|bbc65c4cbc83a933|1549|rds|local|vector|table2_1df4de6e||21.75||
+table1_e08729d2|pattern|07747399012527b1|136f28df20c53983||-1732709966||||237236|rds|local|vector||table1_e08729d2_6a33d72d|5873.01||
+table1_e08729d2_6a33d72d|branch|132f68da237d351c|136f28df20c53983|f7bae70521854687|-1562460762||t19735.5930740809s|0ea619d19aa86746|237236|rds|local|vector|table1_e08729d2||5873.01|package data.table was built under R version 4.2.3|
+table1_ed0b91eb|pattern|fcfdbfc6aa65855a|9b44adcf9d9b9be3||443003857||||236620|rds|local|vector||table1_ed0b91eb_6a33d72d|4259.07||
+table1_ed0b91eb_6a33d72d|branch|4b677d2fa3fdb3c7|9b44adcf9d9b9be3|f7bae70521854687|-1468938208||t19735.6423697336s|5066e3226c4c896b|236620|rds|local|vector|table1_ed0b91eb||4259.07||
+table2|stem|16e21ccc8d1601c5|6de33646930279c3|ec87c76e6141fd63|-1499021702||t19737.6010220184s|c7bb2b99638295a9|1154551|rds|local|group|||0.02||
+table2_1df4de6e|pattern|dc421bdae4066d49|1f13c2b410f66ca4||1347658465||||565053|rds|local|vector||table2_1df4de6e_7fa84b28|15854.17||
+table2_1df4de6e_7fa84b28|branch|4ad3b71c2b5af536|1f13c2b410f66ca4|55ae474509178bdc|-1055308090||t19737.1302634314s|438aee0065f2ee0c|565053|rds|local|vector|table2_1df4de6e||15854.17||
 table2_6192178c|pattern|03d9877a07980431|de52ce9f24423a68||1095671415||||1552|rds|local|vector||table2_6192178c_7fa84b28|21.98||
 table2_6192178c_7fa84b28|branch|cffc8a07502bea0b|de52ce9f24423a68|c15ff61f97790971|-317494627||t19730.5871913462s|bad4729a6c5a6a49|1552|rds|local|vector|table2_6192178c||21.98||
+table2_9c0c00d9|pattern|76ca756f9b095bd3|5215d07036708e7a||-1911920621||||552595|rds|local|vector||table2_9c0c00d9_7fa84b28|40674.42||
+table2_9c0c00d9_7fa84b28|branch|90ce668c947a67cf|5215d07036708e7a|55ae474509178bdc|-847543225||t19737.6010093057s|02d21e536dc1bdff|552595|rds|local|vector|table2_9c0c00d9||40674.42||
 table2_batch|stem|be28d49a41888700|0bc268ea2d179e02|ef46db3751d8e999|-857613457||t19730.528455284s|ac45463db19e2cbe|48|rds|local|vector||table2_batch_ccba877f|0||
 tableD1|stem|2821a369403afe9f|be6befe77924ffa0|93c18cb9233d3755|-1019534106||t19730.5871924093s|0c28402159ff05b0|4996|rds|local|group|||0.02||
 tableD1_0224064d|pattern|df1cf2405fd637ca|580b27ffc1f36118||1244716319||||843|rds|local|vector||tableD1_0224064d_5728a748|6.38||
 tableD1_0224064d_5728a748|branch|890048b0622db196|580b27ffc1f36118|166b2e60a13d40d8|-334654422||t19730.5862698664s|982cb2262d0bfcde|843|rds|local|vector|tableD1_0224064d||6.38||
 tableD1_0b94efb6|pattern|8fc63feeba35623e|01e6cdf384290283||-847248816||||843|rds|local|vector||tableD1_0b94efb6_5728a748|11.54||
 tableD1_0b94efb6_5728a748|branch|3c02ccbfd41c327c|01e6cdf384290283|166b2e60a13d40d8|-930903194||t19730.5289169017s|982cb2262d0bfcde|843|rds|local|vector|tableD1_0b94efb6||11.54||
+tableD1_1df4de6e_5728a748|branch||3e9a60c1aec35ed7|b40d1d062121a428|940656444||t19733.6552968614s||0|rds|local|vector|tableD1_1df4de6e||5.85|package data.table was built under R version 4.2.3|object must be a data frame.
 tableD1_4b14b5f5|pattern|0fa06bfc05a2dcf0|f511b25006d8851f||-1153537536||||838|rds|local|vector||tableD1_4b14b5f5_5728a748|4.36||
 tableD1_4b14b5f5_5728a748|branch|b4487ece431dd8ab|f511b25006d8851f|166b2e60a13d40d8|1045304719||t19730.5863205957s|9d68b91b65b49305|838|rds|local|vector|tableD1_4b14b5f5||4.36||
 tableD1_6565dfc6|pattern|4ae8317ad67d5aac|45a9dd71f24b29f7||-1399120215||||839|rds|local|vector||tableD1_6565dfc6_5728a748|19.51||
@@ -91,10 +79,63 @@ tableD1_e4e6a9f2|pattern|04cd8da04561d588|641e69cf2c9018b2||992903474||||838|rds
 tableD1_e4e6a9f2_5728a748|branch|e57eb4473b194735|641e69cf2c9018b2|166b2e60a13d40d8|-884351350||t19730.5861958311s|9d68b91b65b49305|838|rds|local|vector|tableD1_e4e6a9f2||11.81|package data.table was built under R version 4.2.3|
 tableD1_ed7693f6|pattern|2abc55aadd9a9e68|593c062965e150e0||770348713||||834|rds|local|vector||tableD1_ed7693f6_5728a748|30.89||
 tableD1_ed7693f6_5728a748|branch|db1ef50c6cc49d70|593c062965e150e0|166b2e60a13d40d8|-428250116||t19730.5299630957s|926031873599603c|834|rds|local|vector|tableD1_ed7693f6||30.89||
+tableD2|stem|e12c2c08bc0225b5|03657f07202c0f4b|a9556d662813f2b1|-1318223541||t19737.6010191643s|20db058481ef3df3|1890422|rds|local|group|||0.02||
+tableD2_31eaae1b|pattern|a7e54a22b7de9014|31b5a76e2e3f1af8||1135479014||||240117|rds|local|vector||tableD2_31eaae1b_42d6cc33|13255.99||
+tableD2_31eaae1b_42d6cc33|branch|1ceff211c13ede55|31b5a76e2e3f1af8|e986197fba1e33c8|1434328933||t19731.7511722355s|79987287ce0d40bc|240117|rds|local|vector|tableD2_31eaae1b||13255.99||
+tableD2_4ee47cab_42d6cc33|branch||7f971f8e6f2ee600|e986197fba1e33c8|603473387||t19732.2675150965s||0|rds|local|vector|tableD2_4ee47cab||9053.08|glm.fit algorithm did not converge. glm.fit algorithm did not converge|y values must be 0  y  1
+tableD2_batch|stem|be28d49a41888700|0bc268ea2d179e02|ef46db3751d8e999|2139891172||t19730.6804260494s|ac45463db19e2cbe|48|rds|local|vector||tableD2_batch_ccba877f|0||
 test|stem|95ddee1b8237ddf9|3fa255c775b5f763|2da4fc1ad4dd9ed0|1064684737||t19481.5791177361s|b2a37e7acd6b186f|188|rds|local|vector|||101.68|package data.table was built under R version 4.2.3|
+tableD2_16513959_42d6cc33|branch|8614e0bb20ff823d|36b4db77e291c842|2bb195312890593f|2078962286||t19737.7844498237s|0464f1ad3cf9f308|310403|rds|local|vector|tableD2_16513959||11287.89|package data.table was built under R version 4.2.3. glm.fit algorithm did not converge. glm.fit algorithm did not converge. glm.fit algorithm did not converge. glm.fit algorithm did not converge|
+tableD2_16513959|pattern|b3505bcd046ce43f|36b4db77e291c842||-1278542425||||310403|rds|local|vector||tableD2_16513959_42d6cc33|11287.89||
+tableD2_2f09455f_42d6cc33|branch|8bc87f9377f6a9de|b49d29aabe1d11e7|2bb195312890593f|1721212585||t19737.8571296316s|2617597aabc22ffb|314810|rds|local|vector|tableD2_2f09455f||6279.48||
+tableD2_2f09455f|pattern|e1a295d977ca3066|b49d29aabe1d11e7||1962166703||||314810|rds|local|vector||tableD2_2f09455f_42d6cc33|6279.48||
+tableD2_3b5af51b_42d6cc33|branch|668bf4e1910e5e9e|7863b358aa823fb0|2bb195312890593f|2055776698||t19737.9262517029s|5e880e4ee4f49cd4|315257|rds|local|vector|tableD2_3b5af51b||5972.09||
+tableD2_3b5af51b|pattern|2a813b16199dd0ef|7863b358aa823fb0||1861189219||||315257|rds|local|vector||tableD2_3b5af51b_42d6cc33|5972.09||
+tableD2_3fbca480_42d6cc33|branch|0ff23c6c0a4c4c09|95bde6a1e44c0200|2bb195312890593f|546775232||t19738.0330785758s|f1de343917753b74|310679|rds|local|vector|tableD2_3fbca480||9229.69||
+tableD2_3fbca480|pattern|0b09c8693f5822a2|95bde6a1e44c0200||2118031621||||310679|rds|local|vector||tableD2_3fbca480_42d6cc33|9229.69||
+tableD2_44a92743_42d6cc33|branch|a622d60fa148e1b1|141632ef7e131369|2bb195312890593f|-866245612||t19738.1421595717s|8dfd7c0c2bfa4b34|310488|rds|local|vector|tableD2_44a92743||9424.53|glm.fit algorithm did not converge. glm.fit algorithm did not converge|
+tableD2_44a92743|pattern|b6e58a27b27ba695|141632ef7e131369||2132288302||||310488|rds|local|vector||tableD2_44a92743_42d6cc33|9424.53||
+tableD2_61a712d6_42d6cc33|branch|f5295515e0aebca5|adff8c42ee8f8a98|2bb195312890593f|2029127036||t19738.2574561364s|1cef25beb78e562b|310465|rds|local|vector|tableD2_61a712d6||9961.57||
+tableD2_61a712d6|pattern|b6545c92098804fd|adff8c42ee8f8a98||-262113016||||310465|rds|local|vector||tableD2_61a712d6_42d6cc33|9961.57||
+tableD2_766b13aa_42d6cc33|branch|3c01a13f30efe4f7|b127062f667ca9f2|2bb195312890593f|-1261136536||t19738.3376726903s|2b70172f23b04395|313880|rds|local|vector|tableD2_766b13aa||6930.53||
+tableD2_766b13aa|pattern|ec955653187c43c7|b127062f667ca9f2||1320709963||||313880|rds|local|vector||tableD2_766b13aa_42d6cc33|6930.53||
+tableD2_a9a412c2_42d6cc33|branch|7569a90e3d907ac1|39c6bb483865d98d|2bb195312890593f|-1219972109||t19738.4501111263s|ffc42e493ec97610|314540|rds|local|vector|tableD2_a9a412c2||9714.97||
+tableD2_a9a412c2|pattern|9ef2e3a5b44083c7|39c6bb483865d98d||-1899193603||||314540|rds|local|vector||tableD2_a9a412c2_42d6cc33|9714.97||
+table1_eee72157_6a33d72d|branch|a86fc25a66dadbc4|d23f3491b6cf1c77|fb9a280f6e214ae3|-1390890454||t19738.5041746836s|c1c142ca7289212b|311734|rds|local|vector|table1_eee72157||3933.31|package data.table was built under R version 4.2.3|
+table1_eee72157|pattern|500eabc1f8b7f989|d23f3491b6cf1c77||-2109395211||||311734|rds|local|vector||table1_eee72157_6a33d72d|3933.31||
+table1_024e9c43_6a33d72d|branch|d78992e9765dbbae|e116bc895217191d|fb9a280f6e214ae3|-577516879||t19738.5634083332s|5c5688c239c1dc3f|317468|rds|local|vector|table1_024e9c43||5117.74||
+table1_024e9c43|pattern|815345eb1b26416a|e116bc895217191d||950244850||||317468|rds|local|vector||table1_024e9c43_6a33d72d|5117.74||
+table1_8c4e42cc_6a33d72d|branch|60b28ef5ef6d8782|0c82f6dbfd103519|fb9a280f6e214ae3|4528183||t19738.6266775712s|0d6fbe93eebb8537|312588|rds|local|vector|table1_8c4e42cc||5466.4||
+table1_8c4e42cc|pattern|cedd778732d8dd9d|0c82f6dbfd103519||971349763||||312588|rds|local|vector||table1_8c4e42cc_6a33d72d|5466.4||
+nodes|object|ffb2fb99f50fa39d|||||||||||||||
+make_prediction_task|function|e0034ad786531407|||||||||||||||
+make_task|function|99b169615325259c|||||||||||||||
+setting_iv|object|785ce963dd6e43aa|||||||||||||||
+simulateData|function|0a739af0f4e98ee4|||||||||||||||
+formula_mis1|object|8888ce4f37497051|||||||||||||||
+setting_i|object|d8d53bf4408eadf0|||||||||||||||
+formula_mis2|object|0e145e2635a6379a|||||||||||||||
+formula_mis3|object|70d653144192c6b3|||||||||||||||
+values_tableD2|object|b2e748e4a720e5f0|||||||||||||||
+formula_correct|object|7015109760f995db|||||||||||||||
+setting_iii|object|9c4fc4f49ecd2fcc|||||||||||||||
+setting_ii|object|ae481c453beb4c77|||||||||||||||
+theTruth|function|9dc1a4d04af9f045|||||||||||||||
+values_table1|object|669435a272453ed5|||||||||||||||
 thepackages|object|62ec0a3e4b4a1d38|||||||||||||||
-theTruth|function|ef76c7cdedbb8a6a|||||||||||||||
-values_table1|object|7f4a8e0d4f7ea0ef|||||||||||||||
+summary.fitLTMLE|function|9ca7b4eba1047ec2|||||||||||||||
+fitInitial|function|7e9bf677e3afeffd|||||||||||||||
+fitLTMLE|function|86933e2ef6e51a3f|||||||||||||||
+table1_1ab6689e_6a33d72d|branch|3f3559c237e3e406|8b84cc381993dfcb|fb9a280f6e214ae3|-1112612691||t19738.9757634108s|02703efdd9afcffe|312705|rds|local|vector|table1_1ab6689e||6506.33|package data.table was built under R version 4.2.3|
+table1_1ab6689e|pattern|f8981bf89947fdea|8b84cc381993dfcb||-1415328339||||312705|rds|local|vector||table1_1ab6689e_6a33d72d|6506.33||
+table1_58c84d76_6a33d72d|branch|4e9be45f84f55cbc|642b15e2c5540109|fb9a280f6e214ae3|-2107578380||t19739.0323054965s|cd2127acb0472f1c|316734|rds|local|vector|table1_58c84d76||4885.21||
+table1_58c84d76|pattern|c308ad4af1e133ad|642b15e2c5540109||237136593||||316734|rds|local|vector||table1_58c84d76_6a33d72d|4885.21||
+table1_5c93c945_6a33d72d|branch|bbb984ba8927a1da|e1e056c9ec3dac12|fb9a280f6e214ae3|1679932452||t19739.1258773034s|4141f2d8cdf48bdf|309209|rds|local|vector|table1_5c93c945||8084.55||
+table1_5c93c945|pattern|53eb23702d9723ab|e1e056c9ec3dac12||-159964062||||309209|rds|local|vector||table1_5c93c945_6a33d72d|8084.55||
+table1_8f175767_6a33d72d|branch|ac02acbbcf505b83|2f0cd74f4e6e3ded|fb9a280f6e214ae3|-281937266||t19739.2251139158s|03630416b06779f5|310833|rds|local|vector|table1_8f175767||8574||
+table1_8f175767|pattern|986c8a1c03910f41|2f0cd74f4e6e3ded||-674150275||||310833|rds|local|vector||table1_8f175767_6a33d72d|8574||
+table1_eaff7453_6a33d72d|branch|cbc20819796e1aea|1c67648d9adc212a|fb9a280f6e214ae3|-1236887486||t19739.3348831397s|8e1d56e1344a8f0a|309353|rds|local|vector|table1_eaff7453||9483.96||
+table1_eaff7453|pattern|68c714567e4d5e47|1c67648d9adc212a||-85336353||||309353|rds|local|vector||table1_eaff7453_6a33d72d|9483.96||
 nodes|object|ffb2fb99f50fa39d
 make_prediction_task|function|e0034ad786531407
 make_task|function|99b169615325259c
@@ -102,20 +143,15 @@ setting_iv|object|785ce963dd6e43aa
 simulateData|function|0a739af0f4e98ee4
 formula_mis1|object|8888ce4f37497051
 setting_i|object|d8d53bf4408eadf0
-formula_mis2|object|7a10ab25b8740993
-formula_mis3|object|a5560177661d23e3
-values_tableD2|object|38ab618fc8b0fac3
+formula_mis2|object|0e145e2635a6379a
+formula_mis3|object|70d653144192c6b3
+values_tableD2|object|b2e748e4a720e5f0
 formula_correct|object|7015109760f995db
 setting_iii|object|9c4fc4f49ecd2fcc
 setting_ii|object|ae481c453beb4c77
-theTruth|function|e948cd65b051610c
-values_table1|object|7f4a8e0d4f7ea0ef
+theTruth|function|9dc1a4d04af9f045
+values_table1|object|669435a272453ed5
 thepackages|object|62ec0a3e4b4a1d38
-summary.fitLTMLE|function|076b82d4292708af
+summary.fitLTMLE|function|9ca7b4eba1047ec2
 fitInitial|function|7e9bf677e3afeffd
-fitLTMLE|function|ce47965fde2f0d68
-tableD2_batch|stem|be28d49a41888700|0bc268ea2d179e02|ef46db3751d8e999|2139891172||t19730.6804260494s|ac45463db19e2cbe|48|rds|local|vector||tableD2_batch_ccba877f|0||
-table1_8de6c105_6a33d72d|branch|afe9d1e0156df9ea|2a6e0a2551bac73f|5765605cea306b2b|-1291240027||t19730.7599411282s|111dab6731a93f01|238842|rds|local|vector|table1_8de6c105||6870.06|package data.table was built under R version 4.2.3|
-table1_8de6c105|pattern|c7c68026f71b61b7|2a6e0a2551bac73f||-474040902||||238842|rds|local|vector||table1_8de6c105_6a33d72d|6870.06||
-table1_05012345_6a33d72d|branch|66f3ef2c00134537|278319800035661e|5765605cea306b2b|-1008358222||t19730.8393962169s|482c87ae26839f90|233396|rds|local|vector|table1_05012345||6864.87||
-table1_05012345|pattern|3bf30992a41489b9|278319800035661e||1483336353||||233396|rds|local|vector||table1_05012345_6a33d72d|6864.87||
+fitLTMLE|function|86933e2ef6e51a3f

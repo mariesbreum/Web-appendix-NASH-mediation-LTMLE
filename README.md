@@ -193,23 +193,58 @@ below.
 ### Table 1 <a name="table1"></a>
 
 ``` r
-x <- tar_read(table1)
+table1 <- targets::tar_read(table1)
+setDT(table1)
+table1[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=tar_group]
+#>    tar_group    est.sde     bias.sde      sd.sde     se.sde cov.sde     est.sie
+#> 1:         6 0.12648838  0.126411381 0.048569600 0.10622777       1 -0.03254927
+#> 2:         2 0.16422114 -0.048175358 0.061621392 0.10335714       1  0.09873746
+#> 3:         5 0.24350938  0.006896384 0.054193700 0.11402052       1  0.04544718
+#> 4:         8 0.01738624  0.016965236 0.159104233 0.07361353       1 -0.02027316
+#> 5:         7 0.01298563  0.012138134 0.022978452 0.02689906       1  0.08642641
+#> 6:         4 0.19562409 -0.015749906 0.048869893 0.02755656       1  0.06170574
+#> 7:         3 0.23941930  0.002220796 0.005452400 0.02877880       1 -0.01234246
+#> 8:         1 0.03884899  0.038283993 0.007424461 0.03656809       1 -0.02064717
+#>        bias.sie      sd.sie     se.sie cov.sie       est.oe      bias.oe
+#> 1: -0.124327775 0.102823690 0.08672687     0.5  0.093939107  0.002083607
+#> 2:  0.027007959 0.030408760 0.08256899     1.0  0.262958601 -0.021167399
+#> 3:  0.039049683 0.074906956 0.09585211     1.0  0.288956567  0.045946067
+#> 4: -0.025259165 0.047342152 0.04623339     1.0 -0.002886929 -0.008293929
+#> 5:  0.002040410 0.018549227 0.01990632     1.0  0.099412044  0.014178544
+#> 6: -0.007970762 0.028484713 0.02078916     1.0  0.257329832 -0.023720668
+#> 7: -0.017807961 0.009125238 0.02255570     1.0  0.227076835 -0.015587165
+#> 8: -0.024831172 0.024081178 0.03129072     1.0  0.018201821  0.013452821
+#>          sd.oe      se.oe cov.oe
+#> 1: 0.054254090 0.05859015    1.0
+#> 2: 0.031212633 0.05419555    1.0
+#> 3: 0.020713256 0.05517430    1.0
+#> 4: 0.111762081 0.05725664    1.0
+#> 5: 0.004429224 0.01805531    1.0
+#> 6: 0.020385180 0.01725981    0.5
+#> 7: 0.014577638 0.01783480    1.0
+#> 8: 0.016656716 0.01803490    1.0
 ```
 
 ### Table 2 <a name="table2"></a>
 
 ``` r
-x <- tar_read(table2)
+x2 <- targets::tar_read(table2)
+setDT(x2)
+x2[, .(mean(est.sde), sd(est.sde), mean(se.sde), mean(est.sie), sd(est.sie), mean(se.sie), mean(est.oe), sd(est.oe), mean(se.oe)), by=.(n, mis)]
 ```
 
 ### Table D1 <a name="tableD1"></a>
 
 ``` r
-x <- tar_read(tableD1)
+x3 <- targets::tar_read(tableD1)
+setDT(x3)
+x3[, .(mean(est.sde), sd(est.sde), mean(se.sde), mean(est.sie), sd(est.sie), mean(se.sie), mean(est.oe), sd(est.oe), mean(se.oe)), by=.(n, n_bins)]
 ```
 
 ### Table D2 <a name="tableD2"></a>
 
 ``` r
-x <- tar_read(tableD2)
+x4 <- targets::tar_read(tableD2)
+setDT(x4)
+x4[, .(n, mean(est.sde), sd(est.sde), mean(se.sde), mean(est.sie), sd(est.sie), mean(se.sie), mean(est.oe), sd(est.oe), mean(se.oe)), by=tar_group]
 ```

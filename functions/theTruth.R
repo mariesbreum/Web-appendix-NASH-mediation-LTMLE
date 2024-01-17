@@ -52,16 +52,21 @@ theTruth <- function(n,
   sde.0 <- psi10.0-psi00.0
   sie.0 <- psi11.0-psi10.0
   oe.0 <- psi11.0-psi00.0
-  sde.prop.0 <- sde.0/oe.0
-  sie.prop.0 <- sie.0/oe.0
+  pm.0 <- sde.0/oe.0
+
   sde.OR.0 <- (psi10.0/(1-psi10.0)) / (psi00.0/(1-psi00.0))
   sie.OR.0 <- (psi11.0/(1-psi11.0)) / (psi10.0/(1-psi10.0))
   oe.OR.0  <- (psi11.0/(1-psi11.0)) / (psi00.0/(1-psi00.0))
+  sde.logOR.0 <- log(sde.OR.0)
+  sie.logOR.0 <- log(sie.OR.0)
+  oe.logOR.0 <- log(oe.OR.0)
+  pm.logOR.0 <- sde.logOR.0/oe.logOR.0
   
   return(data.frame(psi11.true=psi11.0, psi10.true=psi10.0, psi00.true = psi00.0,
                     sde.true = sde.0, sie.true = sie.0, oe.true = oe.0, 
-                    sde.prop.true = sde.prop.0, sie.prop.true = sie.prop.0,
+                    pm.true = pm.0,
                     sde.OR.true = sde.OR.0, sie.OR.true = sie.OR.0, 
-                    oe.OR.true = oe.OR.0))
+                    oe.OR.true = oe.OR.0, sde.logOR.true = sde.logOR.0, sie.logOR.true = sie.logOR.0, 
+                    oe.logOR.true = oe.logOR.0, pm.logOR.true=pm.logOR.0))
 }
 

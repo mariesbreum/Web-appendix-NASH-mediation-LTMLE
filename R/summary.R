@@ -7,15 +7,17 @@
 summary.fitLTMLE <- function(obj, type="diff", conf.int=0.95){
   if(type=="diff"){
     x <- obj$est.diff
-    out <- data.frame("est" = c(x$est.sde, x$est.sie, x$est.oe),
-                      "se" = c(x$se.sde, x$se.sie, x$se.oe),
+    out <- data.frame("est" = c(x$est.sde, x$est.sie, x$est.oe, x$est.pm),
+                      "se" = c(x$se.sde, x$se.sie, x$se.oe, x$se.pm),
                       "CI.low" = c(x$est.sde-qnorm((1+conf.int)/2)*x$se.sde, 
                                    x$est.sie-qnorm((1+conf.int)/2)*x$se.sie, 
-                                   x$est.oe-qnorm((1+conf.int)/2)*x$se.oe),
+                                   x$est.oe-qnorm((1+conf.int)/2)*x$se.oe,
+                                   x$est.pm-qnorm((1+conf.int)/2)*x$se.pm),
                       "CI.up" = c(x$est.sde+qnorm((1+conf.int)/2)*x$se.sde, 
                                   x$est.sie+qnorm((1+conf.int)/2)*x$se.sie, 
-                                  x$est.oe+qnorm((1+conf.int)/2)*x$se.oe))
-    rownames(out) <- c("sde", "sie", "oe")
+                                  x$est.oe+qnorm((1+conf.int)/2)*x$se.oe,
+                                  x$est.pm+qnorm((1+conf.int)/2)*x$se.pm))
+    rownames(out) <- c("sde", "sie", "oe", "pm")
   }
   if(type=="OR"){
     x <- obj$est.OR
@@ -29,15 +31,19 @@ summary.fitLTMLE <- function(obj, type="diff", conf.int=0.95){
                                   x$est.ORoe+qnorm((1+conf.int)/2)*x$se.ORoe))
     rownames(out) <- c("OR_sde", "OR_sie", "OR_oe")
   }
-  if(type=="prop"){
-    x <- obj$est.prop
-    out <- data.frame("est" = c(x$est.propsde, x$est.propsie),
-                      "se" = c(x$se.propsde, x$se.sie),
-                      "CI.low" = c(x$est.propsde-qnorm((1+conf.int)/2)*x$se.propsde, 
-                                   x$est.propsie-qnorm((1+conf.int)/2)*x$se.propsie),
-                      "CI.up" = c(x$est.propsde+qnorm((1+conf.int)/2)*x$se.propsde, 
-                                  x$est.propsie+qnorm((1+conf.int)/2)*x$se.propsie))
-    rownames(out) <- c("prop_sde", "prop_sie")
+  if(type=="logOR"){
+    x <- obj$est.logOR
+    out <- data.frame("est" = c(x$est.logORsde, x$est.logORsie, x$est.logORoe, x$est.logORpm),
+                      "se" = c(x$se.ORsde, x$se.ORsie, x$se.ORoe, x$se.logORpm),
+                      "CI.low" = c(x$est.logORsde-qnorm((1+conf.int)/2)*x$se.logORsde, 
+                                   x$est.logORsie-qnorm((1+conf.int)/2)*x$se.logORsie, 
+                                   x$est.logORoe-qnorm((1+conf.int)/2)*x$se.logORoe,
+                                   x$est.logORpm-qnorm((1+conf.int)/2)*x$se.logORpm),
+                      "CI.up" = c(x$est.logORsde+qnorm((1+conf.int)/2)*x$se.logORsde, 
+                                  x$est.logORsie+qnorm((1+conf.int)/2)*x$se.logORsie, 
+                                  x$est.logORoe+qnorm((1+conf.int)/2)*x$se.logORoe,
+                                  x$est.logORpm+qnorm((1+conf.int)/2)*x$se.logORpm))
+    rownames(out) <- c("logOR_sde", "logOR_sie", "logOR_oe", "logOR_pm")
   }
   if(type=="psi"){
     x <- obj$est.psi
