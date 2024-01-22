@@ -161,8 +161,18 @@ table2 <- targets::tar_read(table2)
 setDT(table2)
 table2[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=.(n, mis)]
 ```
+
 ```{r echo = TRUE, eval = TRUE}
-table2[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
+table2[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))),  by=.(n, mis)]
+```
+```{r echo = TRUE, eval = TRUE}
+table3 <- targets::tar_read(table3)
+setDT(table3)
+table3[, .(n=mean(n),alphaY=mean(alphaY),est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=tar_group]
+```
+
+```{r echo = TRUE, eval = TRUE}
+table3[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
 ```
 
 ### Table D1 <a name="tableD1"></a>
@@ -178,7 +188,7 @@ tableD1[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(
 
 
 ```{r echo = TRUE, eval = TRUE}
-tableD1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
+tableD1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=.(n, n_bins)]
 ```
 
 ### Table D2 <a name="tableD2"></a>

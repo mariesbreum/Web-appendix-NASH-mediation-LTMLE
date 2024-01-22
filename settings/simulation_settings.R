@@ -86,3 +86,9 @@ values_tableD2 <- tibble::tibble(n=c(rep(400,4), rep(4000,4)),
                                  betaY.M = rep(c(0.115, 0.095, 0.08, 0.07), 2))
 values_table3 <- tibble::tibble(n=c(rep(400,4), rep(4000,4)), 
                                 alphaY = rep(c(-3.0, -2.5, -2.0, -1.5), 2))
+
+
+values_tableD2 <- tibble::tibble(n=c(rep(400,4), rep(4000,4)), 
+                                 betaM1.A = rep(c(1.25, 1.50, 1.75, 2.00), 2),
+                                 betaM2.A = rep(c(1.50, 1.75, 2.00, 2.25), 2),
+                                 betaY.M = rep(c(0.125, 0.115, 0.105, 0.095), 2))

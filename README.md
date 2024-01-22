@@ -268,16 +268,92 @@ table2[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(e
 ```
 
 ``` r
-table2[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
-#>    tar_group    n  est.sde   bias.sde    sd.sde    se.sde   cov.sde  est.sie
-#> 1:         1  400 1.659391 0.13644746 0.7526482 0.6718522 0.9080000 1.410537
-#> 2:         2 4000 1.533003 0.01086621 0.2074471 0.2000640 0.9416667 1.353409
+table2[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))),  by=.(n, mis)]
+#>       n  mis    n  est.sde   bias.sde    sd.sde    se.sde cov.sde  est.sie
+#> 1:  400 mis1  400 1.660989 0.13804587 0.7589402 0.6822139   0.910 1.418856
+#> 2:  400 mis2  400 1.657807 0.13486440 0.7510201 0.6641337   0.904 1.398826
+#> 3:  400 mis3  400 1.659375 0.13643210 0.7486960 0.6692089   0.910 1.413930
+#> 4: 4000 mis1 4000 1.533559 0.01142253 0.2100204 0.2033034   0.946 1.354669
+#> 5: 4000 mis2 4000 1.532134 0.00999803 0.2052127 0.1974234   0.938 1.352660
+#> 6: 4000 mis3 4000 1.533314 0.01117806 0.2072851 0.1994652   0.941 1.352899
 #>       bias.sie    sd.sie    se.sie cov.sie   est.oe     bias.oe     sd.oe
-#> 1: 0.064426986 0.4293656 0.3916082   0.914 2.128475 0.078749278 0.6384403
-#> 2: 0.007250777 0.1389823 0.1318678   0.940 2.052403 0.003402548 0.1706274
-#>        se.oe    cov.oe
-#> 1: 0.5866704 0.9386667
-#> 2: 0.1742107 0.9510000
+#> 1: 0.072745791 0.4434444 0.4090593   0.918 2.136339 0.086613368 0.6425756
+#> 2: 0.052715523 0.4091070 0.3663847   0.908 2.115212 0.065485692 0.6327978
+#> 3: 0.067819644 0.4349758 0.3993807   0.916 2.133875 0.084148775 0.6403361
+#> 4: 0.008510873 0.1421175 0.1352350   0.943 2.054158 0.005157708 0.1707933
+#> 5: 0.006501470 0.1351687 0.1282658   0.936 2.051078 0.002077667 0.1705240
+#> 6: 0.006739989 0.1397016 0.1321025   0.941 2.051973 0.002972268 0.1707210
+#>        se.oe cov.oe
+#> 1: 0.5903807  0.940
+#> 2: 0.5815996  0.934
+#> 3: 0.5880308  0.942
+#> 4: 0.1746725  0.951
+#> 5: 0.1738629  0.949
+#> 6: 0.1740967  0.953
+```
+
+``` r
+table3 <- targets::tar_read(table3)
+setDT(table3)
+table3[, .(n=mean(n),alphaY=mean(alphaY),est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=tar_group]
+#>    tar_group    n alphaY    est.sde      bias.sde     sd.sde     se.sde cov.sde
+#> 1:         3  400   -3.0 0.01802501  0.0006377577 0.03616706 0.03048308   0.895
+#> 2:         5  400   -2.5 0.02515270 -0.0017797351 0.04389001 0.03866611   0.907
+#> 3:         6  400   -2.0 0.04466069  0.0043368990 0.05818997 0.05103492   0.926
+#> 4:         2  400   -1.5 0.05734545 -0.0001438955 0.07007235 0.06275989   0.895
+#> 5:         4 4000   -3.0 0.01793496  0.0005526767 0.01223554 0.01119676   0.930
+#> 6:         8 4000   -2.5 0.02704639  0.0001334155 0.01426910 0.01404310   0.938
+#> 7:         7 4000   -2.0 0.03917403 -0.0011724002 0.01757468 0.01731478   0.935
+#> 8:         1 4000   -1.5 0.05598875 -0.0014235673 0.02196513 0.02116548   0.930
+#>       est.sie      bias.sie     sd.sie      se.sie cov.sie     est.oe
+#> 1: 0.01440752 -0.0026812534 0.02919041 0.022572720   0.930 0.03243253
+#> 2: 0.02437940 -0.0015009408 0.03348658 0.028373302   0.915 0.04953210
+#> 3: 0.03215483 -0.0052439368 0.04724128 0.038327935   0.902 0.07681552
+#> 4: 0.04466305 -0.0058449723 0.05455021 0.047300627   0.907 0.10200850
+#> 5: 0.01669959 -0.0003567820 0.01024367 0.008812842   0.913 0.03463456
+#> 6: 0.02508549 -0.0007631167 0.01174295 0.011060759   0.926 0.05213188
+#> 7: 0.03677598 -0.0005178896 0.01398986 0.013610817   0.934 0.07595001
+#> 8: 0.05094826  0.0002207250 0.01782848 0.016705260   0.922 0.10693701
+#>          bias.oe       sd.oe       se.oe cov.oe
+#> 1: -0.0020434958 0.025284707 0.024923675  0.941
+#> 2: -0.0032806759 0.030527858 0.030895037  0.946
+#> 3: -0.0009070378 0.036871010 0.037502310  0.956
+#> 4: -0.0059888678 0.044508815 0.044097408  0.944
+#> 5:  0.0001958947 0.008041475 0.007965279  0.950
+#> 6: -0.0006297012 0.009616286 0.009837540  0.959
+#> 7: -0.0016902898 0.011402162 0.011929689  0.956
+#> 8: -0.0012028423 0.013543817 0.014023734  0.956
+```
+
+``` r
+table3[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
+#>    tar_group    n      est.sde      bias.sde       sd.sde       se.sde cov.sde
+#> 1:         3  400 1.014827e+08  1.014827e+08 1.350179e+09 5.052827e+07   0.818
+#> 2:         5  400 1.794324e+00  2.609756e-01 1.417482e+00 1.139588e+00   0.849
+#> 3:         6  400 1.790228e+00  2.598049e-01 1.078742e+00 9.479249e-01   0.893
+#> 4:         2  400 1.685393e+00  1.587302e-01 9.183302e-01 7.788264e-01   0.872
+#> 5:         4 4000 1.594551e+00  5.888415e-02 4.470900e-01 4.069613e-01   0.922
+#> 6:         8 4000 1.558928e+00  2.600264e-02 3.266079e-01 3.211841e-01   0.929
+#> 7:         7 4000 1.526048e+00 -4.506545e-03 2.643242e-01 2.594013e-01   0.927
+#> 8:         1 4000 1.524755e+00 -1.377065e-03 2.326991e-01 2.239402e-01   0.925
+#>     est.sie   bias.sie    sd.sie    se.sie cov.sie       est.oe       bias.oe
+#> 1: 1.741615 0.38543749 1.0089453 0.6361929   0.829 1.721288e+08  1.721288e+08
+#> 2: 1.598568 0.24388439 0.7049902 0.5264938   0.873 2.355134e+00  2.783001e-01
+#> 3: 1.486290 0.13440053 0.5862696 0.4607417   0.875 2.272708e+00  2.040619e-01
+#> 4: 1.441700 0.09475674 0.4984781 0.4047720   0.897 2.138565e+00  8.254224e-02
+#> 5: 1.393227 0.03823320 0.2590093 0.2276644   0.923 2.142312e+00  6.155214e-02
+#> 6: 1.370943 0.01722285 0.2053557 0.1908323   0.920 2.089612e+00  1.452092e-02
+#> 7: 1.364903 0.01464297 0.1678236 0.1617623   0.931 2.050123e+00 -1.648097e-02
+#> 8: 1.366044 0.01785025 0.1547381 0.1436676   0.929 2.055410e+00 -2.076326e-03
+#>           sd.oe        se.oe cov.oe
+#> 1: 1.976472e+09 5.317683e+07  0.900
+#> 2: 1.347537e+00 1.186478e+00  0.914
+#> 3: 9.104876e-01 8.874135e-01  0.944
+#> 4: 7.316538e-01 6.837893e-01  0.925
+#> 5: 4.012148e-01 3.843449e-01  0.946
+#> 6: 2.967011e-01 2.986627e-01  0.957
+#> 7: 2.316117e-01 2.377186e-01  0.947
+#> 8: 1.975618e-01 1.997144e-01  0.953
 ```
 
 ### Table D1 <a name="tableD1"></a>
@@ -359,16 +435,40 @@ tableD1[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(
 ```
 
 ``` r
-tableD1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
-#>    tar_group    n  est.sde   bias.sde    sd.sde    se.sde cov.sde  est.sie
-#> 1:         1  400 1.598525 0.07702237 0.6751476 0.6249237  0.9012 1.396590
-#> 2:         2 4000 1.538705 0.01630010 0.2072248 0.2025879  0.9472 1.330937
-#>       bias.sie    sd.sie    se.sie cov.sie   est.oe      bias.oe     sd.oe
-#> 1:  0.05164963 0.4121344 0.3545713  0.8996 2.055457  0.009461533 0.5901859
-#> 2: -0.01461763 0.1369612 0.1292588  0.9328 2.026802 -0.021624697 0.1796505
-#>        se.oe cov.oe
-#> 1: 0.5631509 0.9216
-#> 2: 0.1712437 0.9336
+tableD1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=.(n, n_bins)]
+#>        n n_bins    n  est.sde   bias.sde    sd.sde    se.sde cov.sde  est.sie
+#>  1:  400     10  400 1.616114 0.09461091 0.6825416 0.6349573   0.907 1.274928
+#>  2:  400     20  400 1.599687 0.07818428 0.6765532 0.6249001   0.901 1.390745
+#>  3:  400     40  400 1.594216 0.07271328 0.6737228 0.6223388   0.901 1.427578
+#>  4:  400     80  400 1.591860 0.07035756 0.6723034 0.6214107   0.899 1.441756
+#>  5:  400    160  400 1.590748 0.06924582 0.6715881 0.6210118   0.898 1.447944
+#>  6: 4000     10 4000 1.542887 0.02048245 0.2078696 0.2034049   0.948 1.285548
+#>  7: 4000     20 4000 1.538604 0.01619907 0.2072924 0.2025196   0.947 1.333136
+#>  8: 4000     40 4000 1.537647 0.01524262 0.2071533 0.2023730   0.947 1.342925
+#>  9: 4000     80 4000 1.537278 0.01487340 0.2070965 0.2023297   0.947 1.345944
+#> 10: 4000    160 4000 1.537107 0.01470297 0.2070696 0.2023125   0.947 1.347130
+#>          bias.sie    sd.sie    se.sie cov.sie   est.oe      bias.oe     sd.oe
+#>  1: -0.0700128105 0.3704842 0.3251043   0.872 1.898766 -0.147229331 0.5420037
+#>  2:  0.0458048337 0.4044782 0.3527419   0.903 2.048775  0.002779504 0.5819752
+#>  3:  0.0826377646 0.4160601 0.3619981   0.906 2.095590  0.049595104 0.5949910
+#>  4:  0.0968151687 0.4206043 0.3656849   0.908 2.113269  0.067273972 0.6000108
+#>  5:  0.1030032055 0.4225935 0.3673271   0.909 2.120883  0.074888414 0.6021933
+#>  6: -0.0600063447 0.1333007 0.1249504   0.896 1.962782 -0.085644834 0.1731273
+#>  7: -0.0124186585 0.1348955 0.1294392   0.940 2.030081 -0.018345999 0.1765141
+#>  8: -0.0026289528 0.1354856 0.1303927   0.943 2.043774 -0.004652759 0.1776532
+#>  9:  0.0003902653 0.1356898 0.1306953   0.942 2.047895 -0.000531685 0.1780363
+#> 10:  0.0015755404 0.1357722 0.1308165   0.943 2.049479  0.001051793 0.1781882
+#>         se.oe cov.oe
+#>  1: 0.5305637  0.872
+#>  2: 0.5611540  0.922
+#>  3: 0.5714135  0.936
+#>  4: 0.5754297  0.938
+#>  5: 0.5771936  0.940
+#>  6: 0.1668711  0.892
+#>  7: 0.1714318  0.939
+#>  8: 0.1724003  0.945
+#>  9: 0.1726994  0.946
+#> 10: 0.1728161  0.946
 ```
 
 ### Table D2 <a name="tableD2"></a>
@@ -407,32 +507,32 @@ tableD2[, .(n=mean(n),est.sde=mean(est.sde, na.rm=T), bias.sde = mean(est.sde-sd
 ```
 
 ``` r
-tableD2[, .(n=mean(n), est.sde=mean(est.ORsde, na.rm=T), bias.sde = mean(est.ORsde-sde.OR.true, na.rm=T), sd.sde=sd(est.ORsde, na.rm=T), se.sde=mean(se.ORsde, na.rm=T), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde), na.rm=T), est.sie=mean(est.ORsie, na.rm=T), bias.sie = mean(est.ORsie-sie.OR.true, na.rm=T), sd.sie=sd(est.ORsie, na.rm=T), se.sie=mean(se.ORsie, na.rm=T), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie), na.rm=T), est.oe=mean(est.ORoe, na.rm=T), bias.oe = mean(est.ORoe-oe.OR.true, na.rm=T), sd.oe=sd(est.ORoe, na.rm=T), se.oe=mean(se.ORoe, na.rm=T), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe), na.rm=T)), by=tar_group]
-#>    tar_group    n   est.sde   bias.sde      sd.sde       se.sde   cov.sde
-#> 1:         3  400  3.877327  2.2894615   33.504021    26.218747 0.7400000
-#> 2:         2  400  3.736661  2.1327600   14.046863    13.506489 0.5710000
-#> 3:         8  400  8.362475  6.7479932   41.937051    39.481322 0.3640000
-#> 4:         7  400  9.049258  7.4266645   41.090852    10.255879 0.2180000
-#> 5:         6 4000  4.974122  3.3864241  103.925978   413.081068 0.8490000
-#> 6:         4 4000  1.909805  0.3070164    2.547525     1.294399 0.6710000
-#> 7:         5 4000 57.437958 55.8232847 1018.508956 15207.760394 0.4640000
-#> 8:         1 4000 49.807239 48.1849445  579.146211 10467.599350 0.2587763
-#>         est.sie     bias.sie       sd.sie       se.sie   cov.sie   est.oe
-#> 1: 2.490487e+00 1.141955e+00 6.630151e+00 9.889985e+00 0.7910000 2.183897
-#> 2: 4.542516e+00 3.176388e+00 1.280033e+01 1.065192e+01 0.6230000 2.230441
-#> 3: 1.559748e+01 1.423002e+01 1.198233e+02 1.838857e+02 0.3870000 2.262591
-#> 4: 3.979089e+01 3.842241e+01 2.667363e+02 6.162578e+02 0.2390000 2.296389
-#> 5: 1.518438e+00 1.694708e-01 6.647033e-01 5.338641e-01 0.8750000 2.139109
-#> 6: 2.201868e+00 8.348212e-01 2.179558e+00 2.159173e+00 0.7580000 2.194659
-#> 7: 1.685875e+08 1.685875e+08 5.331203e+09 5.103909e+19 0.5380000 2.207233
-#> 8: 3.497822e+08 3.497822e+08 7.807648e+09 4.900957e+19 0.3129388 2.219701
-#>          bias.oe     sd.oe     se.oe    cov.oe
-#> 1:  0.0427294594 0.5936503 0.6126055 0.9320000
-#> 2:  0.0393872480 0.6795196 0.6308852 0.9280000
-#> 3:  0.0549089123 0.6726752 0.6412938 0.9290000
-#> 4:  0.0759499359 0.6707207 0.6520493 0.9410000
-#> 5: -0.0026246319 0.1854147 0.1853236 0.9460000
-#> 6:  0.0035920899 0.1868457 0.1908355 0.9600000
-#> 7:  0.0004625227 0.1869132 0.1926494 0.9560000
-#> 8: -0.0013138407 0.1881576 0.1940489 0.9468405
+tableD2[est.ORsde<100, .(n=mean(n), est.sde=mean(est.ORsde, na.rm=T), bias.sde = mean(est.ORsde-sde.OR.true, na.rm=T), sd.sde=sd(est.ORsde, na.rm=T), se.sde=mean(se.ORsde, na.rm=T), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde), na.rm=T), est.sie=mean(est.ORsie, na.rm=T), bias.sie = mean(est.ORsie-sie.OR.true, na.rm=T), sd.sie=sd(est.ORsie, na.rm=T), se.sie=mean(se.ORsie, na.rm=T), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie), na.rm=T), est.oe=mean(est.ORoe, na.rm=T), bias.oe = mean(est.ORoe-oe.OR.true, na.rm=T), sd.oe=sd(est.ORoe, na.rm=T), se.oe=mean(se.ORoe, na.rm=T), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe), na.rm=T)), by=tar_group]
+#>    tar_group    n  est.sde  bias.sde     sd.sde   se.sde   cov.sde      est.sie
+#> 1:         3  400 2.221438 0.6335719  3.6177871 2.489427 0.7392177 2.497966e+00
+#> 2:         2  400 3.016866 1.4129383  6.6515290 3.232224 0.5692771 4.560715e+00
+#> 3:         8  400 3.590723 1.9762467  8.6722991 2.068065 0.3530612 1.591553e+01
+#> 4:         7  400 5.583371 3.9607749 13.2214259 2.229632 0.2121827 4.039660e+01
+#> 5:         6 4000 1.687803 0.1001047  0.8463537 0.652217 0.8488488 1.519958e+00
+#> 6:         4 4000 1.909805 0.3070164  2.5475251 1.294399 0.6710000 2.201868e+00
+#> 7:         5 4000 2.509621 0.8949119  4.5099134 2.230725 0.4569402 1.708080e+08
+#> 8:         1 4000 2.948482 1.3262029  7.9744067 1.862219 0.2474542 3.551252e+08
+#>        bias.sie       sd.sie       se.sie   cov.sie   est.oe       bias.oe
+#> 1: 1.149446e+00 6.638723e+00 9.919580e+00 0.7933801 2.183841  0.0426928687
+#> 2: 3.194583e+00 1.282280e+01 1.069439e+01 0.6255020 2.232751  0.0416525712
+#> 3: 1.454803e+01 1.210201e+02 1.876375e+02 0.3948980 2.260997  0.0532631428
+#> 4: 3.902811e+01 2.687161e+02 6.256422e+02 0.2426396 2.292904  0.0724470475
+#> 5: 1.709909e-01 6.632967e-01 5.343187e-01 0.8758759 2.139159 -0.0025736930
+#> 6: 8.348212e-01 2.179558e+00 2.159173e+00 0.7580000 2.194659  0.0035920899
+#> 7: 1.708080e+08 5.366198e+09 5.171134e+19 0.5450861 2.207323  0.0005880624
+#> 8: 3.551251e+08 7.866993e+09 4.975818e+19 0.3167006 2.219778 -0.0011852724
+#>        sd.oe     se.oe    cov.oe
+#> 1: 0.5941974 0.6125588 0.9317954
+#> 2: 0.6794171 0.6316036 0.9287149
+#> 3: 0.6744406 0.6409118 0.9295918
+#> 4: 0.6694116 0.6508442 0.9411168
+#> 5: 0.1855008 0.1853272 0.9459459
+#> 6: 0.1868457 0.1908355 0.9600000
+#> 7: 0.1875186 0.1926667 0.9554205
+#> 8: 0.1891854 0.1940550 0.9460285
 ```
