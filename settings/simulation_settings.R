@@ -60,9 +60,29 @@ formula_mis3 <- list(Cmodel= list("C1 ~ A", "C2 ~ A + M1"),
                      RYmodel= "RY ~ 1", 
                      Ymodel="Y ~ A", 
                      QLmodel= list("QL1 ~ A", "QL2 ~ A"))
+formula_mis4 <- list(Cmodel= list("C1 ~ A", "C2 ~ A + M1"), 
+                     Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                     gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                     RYmodel= "RY ~ 1", 
+                     Ymodel="Y ~ A", 
+                     QLmodel= list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"))
+formula_mis5 <- list(Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
+                     Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                     gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                     RYmodel= "RY ~ 1", 
+                     Ymodel="Y ~ A + M2 + L2", 
+                     QLmodel= list("QL1 ~ A", "QL2 ~ A"))
+formula_mis6 <- list(Cmodel= list("C1 ~ 1", "C2 ~ 1"), 
+                     Mmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
+                     gmodel=list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
+                     RYmodel= "RY ~ 1", 
+                     Ymodel="Y ~ A", 
+                     QLmodel= list("QL1 ~ A", "QL2 ~ A"))
+
 
 values_tableD2 <- tibble::tibble(n=c(rep(400,4), rep(4000,4)), 
                                  betaM1.A = rep(c(1.50, 2.00, 2.50, 3.00), 2),
                                  betaM2.A = rep(c(1.75, 2.25, 2.75, 3.25), 2),
                                  betaY.M = rep(c(0.115, 0.095, 0.08, 0.07), 2))
-                                 
+values_table3 <- tibble::tibble(n=c(rep(400,4), rep(4000,4)), 
+                                alphaY = rep(c(-3.0, -2.5, -2.0, -1.5), 2))

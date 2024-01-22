@@ -324,11 +324,11 @@ fitLTMLE <- function(data, # data table or data frame
                         se.psi00=data[, sd(eif.a0.ga0)/sqrt(n)])
     
   est.diff <- data.frame(est.sde=psi.a1.ga0-psi.a0.ga0, est.sie=psi.a1.ga1-psi.a1.ga0, est.oe=psi.a1.ga1-psi.a0.ga0, 
-                         est.pm=(psi.a1.ga0-psi.a0.ga0)/(psi.a1.ga1-psi.a0.ga0),
+                         est.pm=(psi.a1.ga1-psi.a1.ga0)/(psi.a1.ga1-psi.a0.ga0),
                          se.sde=data[, sd(eif.a1.ga0 - eif.a0.ga0)/sqrt(n)], se.sie=data[, sd(eif.a1.ga1 - eif.a1.ga0)/sqrt(n)], 
                          se.oe=data[, sd(eif.a1.ga1 - eif.a0.ga0)/sqrt(n)], 
-                         se.pm=data[, sd(((eif.a1.ga0 - eif.a0.ga0)*(psi.a1.ga1-psi.a0.ga0) - 
-                                            (psi.a1.ga0-psi.a0.ga0)*(eif.a1.ga1 - eif.a0.ga0))/(psi.a1.ga1-psi.a0.ga0)^2)/sqrt(n)])
+                         se.pm=data[, sd(((eif.a1.ga1 - eif.a1.ga0)*(psi.a1.ga1-psi.a0.ga0) - 
+                                            (psi.a1.ga1-psi.a1.ga0)*(eif.a1.ga1 - eif.a0.ga0))/(psi.a1.ga1-psi.a0.ga0)^2)/sqrt(n)])
   
   est.OR <- data.frame(est.ORsde = (psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0)), 
                        est.ORsie = (psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a1.ga0/(1-psi.a1.ga0)), 
@@ -344,7 +344,7 @@ fitLTMLE <- function(data, # data table or data frame
   est.logOR <- data.frame(est.logORsde = log((psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0))), 
                           est.logORsie = log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a1.ga0/(1-psi.a1.ga0))), 
                           est.logORoe = log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0))), 
-                          est.logORpm = log((psi.a1.ga0/(1-psi.a1.ga0)) / (psi.a0.ga0/(1-psi.a0.ga0)))/
+                          est.logORpm = log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a1.ga0/(1-psi.a1.ga0)))/
                             log((psi.a1.ga1/(1-psi.a1.ga1)) / (psi.a0.ga0/(1-psi.a0.ga0))),
                           se.logORsde = data[, sd(eif.a1.ga0/(psi.a1.ga0*(1-psi.a1.ga0))-
                                                  eif.a0.ga0/(psi.a0.ga0*(1-psi.a0.ga0)))/sqrt(n)], 

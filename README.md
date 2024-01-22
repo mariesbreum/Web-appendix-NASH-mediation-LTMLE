@@ -69,21 +69,15 @@ summary(fit, type="diff", conf.int=0.95)
 #> sde 0.10629133 0.05169714 0.004966801 0.2076158
 #> sie 0.07490711 0.03098414 0.014179306 0.1356349
 #> oe  0.18119844 0.04411706 0.094730579 0.2676663
+#> pm  0.41339822 0.19085926 0.039320937 0.7874755
 ```
 
 ``` r
 summary(fit, type="OR", conf.int=0.95)
-#>             est        se   CI.low    CI.up
-#> OR_sde 1.830818 0.4093687 1.028470 2.633166
-#> OR_sie 1.410378 0.1497081 1.116956 1.703801
-#> OR_oe  2.582146 0.3959921 1.806016 3.358276
-```
-
-``` r
-summary(fit, type="prop", conf.int=0.95)
-#>                est        se     CI.low     CI.up
-#> prop_sde 0.5866018 0.1908593 0.21252450 0.9606791
-#> prop_sie 0.4133982 0.1908593 0.03932094 0.7874755
+#>             est        se    CI.low    CI.up
+#> OR_sde 1.830818 0.5221452 0.8074320 2.854204
+#> OR_sie 1.410378 0.2130413 0.9928253 1.827932
+#> OR_oe  2.582146 0.6202299 1.3665177 3.797774
 ```
 
 ### Data adaptive estimation <a name="dataadaptive"></a>
@@ -118,21 +112,15 @@ summary(fitSL, type="diff")
 #> sde 0.10702494 0.05129647 0.006485698 0.2075642
 #> sie 0.07280904 0.03089198 0.012261869 0.1333562
 #> oe  0.17983398 0.04407563 0.093447327 0.2662206
+#> pm  0.40486811 0.18981409 0.032839333 0.7768969
 ```
 
 ``` r
 summary(fitSL, type="OR")
-#>             est        se   CI.low    CI.up
-#> OR_sde 1.833796 0.4049833 1.040043 2.627549
-#> OR_sie 1.396220 0.1492736 1.103649 1.688791
-#> OR_oe  2.560383 0.3936565 1.788830 3.331936
-```
-
-``` r
-summary(fitSL, type="prop")
-#>                est        se     CI.low     CI.up
-#> prop_sde 0.5951319 0.1898141 0.22310312 0.9671607
-#> prop_sie 0.4048681 0.1898141 0.03283933 0.7768969
+#>             est        se    CI.low    CI.up
+#> OR_sde 1.833796 0.5171016 0.8202953 2.847296
+#> OR_sie 1.396220 0.2090870 0.9864173 1.806023
+#> OR_oe  2.560383 0.6118490 1.3611810 3.759585
 ```
 
 We can also specify a super learner for the update steps
@@ -165,21 +153,15 @@ summary(fitSL2, type="diff")
 #> sde 0.10675197 0.05124666 0.006310358 0.2071936
 #> sie 0.07326009 0.03079037 0.012912068 0.1336081
 #> oe  0.18001205 0.04402465 0.093725331 0.2662988
+#> pm  0.40697324 0.18946752 0.035623726 0.7783228
 ```
 
 ``` r
 summary(fitSL2, type="OR")
-#>             est        se   CI.low    CI.up
-#> OR_sde 1.830842 0.4038036 1.039401 2.622282
-#> OR_sie 1.399052 0.1488589 1.107294 1.690810
-#> OR_oe  2.561443 0.3925751 1.792009 3.330876
-```
-
-``` r
-summary(fitSL2, type="prop")
-#>                est        se     CI.low     CI.up
-#> prop_sde 0.5930268 0.1894675 0.22167725 0.9643763
-#> prop_sie 0.4069732 0.1894675 0.03562373 0.7783228
+#>             est        se    CI.low    CI.up
+#> OR_sde 1.830842 0.5159832 0.8195330 2.842150
+#> OR_sie 1.399052 0.2089270 0.9895626 1.808542
+#> OR_oe  2.561443 0.6116840 1.3625639 3.760321
 ```
 
 ## Simulation study <a name="simulations"></a>
@@ -195,56 +177,103 @@ below.
 ``` r
 table1 <- targets::tar_read(table1)
 setDT(table1)
-table1[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=tar_group]
-#>    tar_group    est.sde     bias.sde      sd.sde     se.sde cov.sde     est.sie
-#> 1:         6 0.12648838  0.126411381 0.048569600 0.10622777       1 -0.03254927
-#> 2:         2 0.16422114 -0.048175358 0.061621392 0.10335714       1  0.09873746
-#> 3:         5 0.24350938  0.006896384 0.054193700 0.11402052       1  0.04544718
-#> 4:         8 0.01738624  0.016965236 0.159104233 0.07361353       1 -0.02027316
-#> 5:         7 0.01298563  0.012138134 0.022978452 0.02689906       1  0.08642641
-#> 6:         4 0.19562409 -0.015749906 0.048869893 0.02755656       1  0.06170574
-#> 7:         3 0.23941930  0.002220796 0.005452400 0.02877880       1 -0.01234246
-#> 8:         1 0.03884899  0.038283993 0.007424461 0.03656809       1 -0.02064717
-#>        bias.sie      sd.sie     se.sie cov.sie       est.oe      bias.oe
-#> 1: -0.124327775 0.102823690 0.08672687     0.5  0.093939107  0.002083607
-#> 2:  0.027007959 0.030408760 0.08256899     1.0  0.262958601 -0.021167399
-#> 3:  0.039049683 0.074906956 0.09585211     1.0  0.288956567  0.045946067
-#> 4: -0.025259165 0.047342152 0.04623339     1.0 -0.002886929 -0.008293929
-#> 5:  0.002040410 0.018549227 0.01990632     1.0  0.099412044  0.014178544
-#> 6: -0.007970762 0.028484713 0.02078916     1.0  0.257329832 -0.023720668
-#> 7: -0.017807961 0.009125238 0.02255570     1.0  0.227076835 -0.015587165
-#> 8: -0.024831172 0.024081178 0.03129072     1.0  0.018201821  0.013452821
-#>          sd.oe      se.oe cov.oe
-#> 1: 0.054254090 0.05859015    1.0
-#> 2: 0.031212633 0.05419555    1.0
-#> 3: 0.020713256 0.05517430    1.0
-#> 4: 0.111762081 0.05725664    1.0
-#> 5: 0.004429224 0.01805531    1.0
-#> 6: 0.020385180 0.01725981    0.5
-#> 7: 0.014577638 0.01783480    1.0
-#> 8: 0.016656716 0.01803490    1.0
+table1[, .(n=mean(n), est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe)), est.pm=mean(est.pm)), by=tar_group]
+#>    tar_group    n       est.sde      bias.sde     sd.sde     se.sde cov.sde
+#> 1:         1  400  0.0011568832  0.0011675242 0.07301953 0.06670194   0.924
+#> 2:         3  400  0.0744694423 -0.0019184837 0.08114126 0.07308826   0.908
+#> 3:         5  400  0.0823141914 -0.0022656746 0.07881146 0.07451760   0.915
+#> 4:         8  400 -0.0002295364 -0.0002110494 0.07124763 0.06367252   0.919
+#> 5:         2 4000 -0.0002590403 -0.0002599653 0.02229865 0.02217322   0.945
+#> 6:         6 4000  0.0766324371  0.0002319491 0.02583902 0.02478594   0.944
+#> 7:         7 4000  0.0858370618  0.0012594558 0.02513973 0.02560213   0.956
+#> 8:         4 4000 -0.0002038614 -0.0001967194 0.02169651 0.02184883   0.943
+#>         est.sie      bias.sie     sd.sie     se.sie cov.sie       est.oe
+#> 1:  0.046665945 -5.841492e-03 0.05752552 0.04863800   0.899  0.047822828
+#> 2:  0.059313102 -4.213797e-03 0.06694654 0.05494333   0.884  0.133782545
+#> 3: -0.004865074 -6.550397e-04 0.06370281 0.05700712   0.898  0.077449118
+#> 4: -0.005046788 -1.978592e-03 0.05505391 0.04578347   0.879 -0.005276324
+#> 5:  0.052234378 -4.556606e-04 0.01785291 0.01698496   0.933  0.051975338
+#> 6:  0.062478101 -1.035404e-03 0.02099953 0.01951755   0.943  0.139110538
+#> 7: -0.004639951 -4.833688e-04 0.02088282 0.02064219   0.945  0.081197111
+#> 8: -0.003104280 -2.308892e-05 0.01752025 0.01685544   0.933 -0.003308141
+#>          bias.oe      sd.oe      se.oe cov.oe     est.pm
+#> 1: -0.0046739679 0.04706333 0.04794442  0.959  1.4652489
+#> 2: -0.0061322805 0.04960323 0.05012726  0.952  0.4214187
+#> 3: -0.0029207143 0.04687635 0.04659996  0.943  0.8453446
+#> 4: -0.0021896411 0.04239586 0.04282797  0.952  1.1477740
+#> 5: -0.0007156259 0.01527452 0.01515538  0.947 -0.1139832
+#> 6: -0.0008034551 0.01613308 0.01590818  0.942  0.5455132
+#> 7:  0.0007760870 0.01451190 0.01473282  0.959  1.0605876
+#> 8: -0.0002198083 0.01349094 0.01359353  0.954 -1.9187879
+```
+
+``` r
+table1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
+#>    tar_group    n  est.sde    bias.sde    sd.sde    se.sde cov.sde   est.sie
+#> 1:         1  400 1.084999 0.085058637 0.5668006 0.4751024   0.885 1.4315645
+#> 2:         3  400 1.637291 0.115380606 0.8135160 0.6860396   0.890 1.4347843
+#> 3:         5  400 1.811524 0.136104395 0.9305888 0.8082223   0.889 1.0616911
+#> 4:         8  400 1.089352 0.089478100 0.6871560 0.5333424   0.876 1.0924682
+#> 5:         2 4000 1.004717 0.004706026 0.1407433 0.1386059   0.939 1.3592423
+#> 6:         6 4000 1.535707 0.013693719 0.2097943 0.2000887   0.931 1.3501997
+#> 7:         7 4000 1.702838 0.027396189 0.2432116 0.2471112   0.954 0.9842119
+#> 8:         4 4000 1.005688 0.005732754 0.1573304 0.1583410   0.937 0.9905519
+#>       bias.sie    sd.sie    se.sie cov.sie    est.oe     bias.oe      sd.oe
+#> 1: 0.083932392 0.4765855 0.3964575   0.893 1.3747786 0.027233205 0.39296684
+#> 2: 0.088306181 0.4694264 0.3805097   0.883 2.0984516 0.049497714 0.59681575
+#> 3: 0.083890672 0.3620927 0.3254496   0.914 1.7083572 0.070141916 0.54957564
+#> 4: 0.114391069 0.4253841 0.3605970   0.904 1.0134048 0.035457352 0.33600504
+#> 5: 0.010610780 0.1488658 0.1394654   0.937 1.3497718 0.001135517 0.11844717
+#> 6: 0.004289089 0.1382954 0.1287657   0.928 2.0514024 0.002947922 0.17544654
+#> 7: 0.006136634 0.1072128 0.1064993   0.946 1.6561956 0.017497463 0.15139075
+#> 8: 0.012568985 0.1240265 0.1184905   0.944 0.9811734 0.003241230 0.09558595
+#>         se.oe cov.oe
+#> 1: 0.38662848  0.926
+#> 2: 0.57388639  0.940
+#> 3: 0.51448571  0.940
+#> 4: 0.32434512  0.937
+#> 5: 0.11754273  0.948
+#> 6: 0.17294340  0.944
+#> 7: 0.15319720  0.957
+#> 8: 0.09656312  0.950
 ```
 
 ### Table 2 <a name="table2"></a>
 
 ``` r
-x2 <- targets::tar_read(table2)
-setDT(x2)
-x2[, .(mean(est.sde), sd(est.sde), mean(se.sde), mean(est.sie), sd(est.sie), mean(se.sie), mean(est.oe), sd(est.oe), mean(se.oe)), by=.(n, mis)]
+table2 <- targets::tar_read(table2)
+setDT(table2)
+table2[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=.(n, mis)]
+```
+
+``` r
+table2[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
 ```
 
 ### Table D1 <a name="tableD1"></a>
 
 ``` r
-x3 <- targets::tar_read(tableD1)
-setDT(x3)
-x3[, .(mean(est.sde), sd(est.sde), mean(se.sde), mean(est.sie), sd(est.sie), mean(se.sie), mean(est.oe), sd(est.oe), mean(se.oe)), by=.(n, n_bins)]
+tableD1 <- targets::tar_read(tableD1)
+setDT(tableD1)
+tableD1[, .(est.psi00=mean(est.psi00), bias.psi00 = mean(est.psi00-psi00.true), sd.psi00=sd(est.psi00), se.psi00=mean(se.psi00), cov.psi00 = mean((psi00.true < est.psi00 + qnorm(0.975)*se.psi00) & (psi00.true > est.psi00 - qnorm(0.975)*se.psi00)), est.psi11=mean(est.psi11), bias.psi11 = mean(est.psi11-psi11.true), sd.psi11=sd(est.psi11), se.psi11=mean(se.psi11), cov.psi11 = mean((psi11.true < est.psi11 + qnorm(0.975)*se.psi11) & (psi11.true > est.psi11 - qnorm(0.975)*se.psi11)), est.psi10=mean(est.psi10), bias.psi10 = mean(est.psi10-psi10.true), sd.psi10=sd(est.psi10), se.psi10=mean(se.psi10), cov.psi10 = mean((psi10.true < est.psi10 + qnorm(0.975)*se.psi10) & (psi10.true > est.psi10 - qnorm(0.975)*se.psi10))), by=.(n, n_bins)]
+```
+
+``` r
+tableD1[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=.(n, n_bins)]
+```
+
+``` r
+tableD1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
 ```
 
 ### Table D2 <a name="tableD2"></a>
 
 ``` r
-x4 <- targets::tar_read(tableD2)
-setDT(x4)
-x4[, .(n, mean(est.sde), sd(est.sde), mean(se.sde), mean(est.sie), sd(est.sie), mean(se.sie), mean(est.oe), sd(est.oe), mean(se.oe)), by=tar_group]
+tableD2 <- targets::tar_read(tableD2)
+setDT(tableD2)
+tableD2[, .(n=mean(n),est.sde=mean(est.sde, na.rm=T), bias.sde = mean(est.sde-sde.true, na.rm=T), sd.sde=sd(est.sde, na.rm=T), se.sde=mean(se.sde, na.rm=T), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde), na.rm=T), est.sie=mean(est.sie, na.rm=T), bias.sie = mean(est.sie-sie.true, na.rm=T), sd.sie=sd(est.sie, na.rm=T), se.sie=mean(se.sie, na.rm=T), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie), na.rm=T), est.oe=mean(est.oe, na.rm=T), bias.oe = mean(est.oe-oe.true, na.rm=T), sd.oe=sd(est.oe, na.rm=T), se.oe=mean(se.oe, na.rm=T), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe), na.rm=T)), by=tar_group]
+```
+
+``` r
+tableD2[, .(n=mean(n), est.sde=mean(est.ORsde, na.rm=T), bias.sde = mean(est.ORsde-sde.OR.true, na.rm=T), sd.sde=sd(est.ORsde, na.rm=T), se.sde=mean(se.ORsde, na.rm=T), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde), na.rm=T), est.sie=mean(est.ORsie, na.rm=T), bias.sie = mean(est.ORsie-sie.OR.true, na.rm=T), sd.sie=sd(est.ORsie, na.rm=T), se.sie=mean(se.ORsie, na.rm=T), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie), na.rm=T), est.oe=mean(est.ORoe, na.rm=T), bias.oe = mean(est.ORoe-oe.OR.true, na.rm=T), sd.oe=sd(est.ORoe, na.rm=T), se.oe=mean(se.ORoe, na.rm=T), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe), na.rm=T)), by=tar_group]
 ```
