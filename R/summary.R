@@ -1,49 +1,35 @@
-# -----------------------------------------------------------------------------
-# summary.fitLTMLE
-# -----------------------------------------------------------------------------
-# Description:
-# summary function for the fitLTMLE fct
+# ------------------------------------------------------------------------------
+# summary.R
+# ------------------------------------------------------------------------------
 # 
 summary.fitLTMLE <- function(obj, type="diff", conf.int=0.95){
   if(type=="diff"){
     x <- obj$est.diff
-    out <- data.frame("est" = c(x$est.sde, x$est.sie, x$est.oe, x$est.pm),
-                      "se" = c(x$se.sde, x$se.sie, x$se.oe, x$se.pm),
-                      "CI.low" = c(x$est.sde-qnorm((1+conf.int)/2)*x$se.sde, 
-                                   x$est.sie-qnorm((1+conf.int)/2)*x$se.sie, 
+    out <- data.frame("est" = c(x$est.ide, x$est.iie, x$est.oe, x$est.gide),
+                      "se" = c(x$se.ide, x$se.iie, x$se.oe, x$se.gide),
+                      "CI.low" = c(x$est.ide-qnorm((1+conf.int)/2)*x$se.ide, 
+                                   x$est.iie-qnorm((1+conf.int)/2)*x$se.iie, 
                                    x$est.oe-qnorm((1+conf.int)/2)*x$se.oe,
-                                   x$est.pm-qnorm((1+conf.int)/2)*x$se.pm),
-                      "CI.up" = c(x$est.sde+qnorm((1+conf.int)/2)*x$se.sde, 
-                                  x$est.sie+qnorm((1+conf.int)/2)*x$se.sie, 
+                                   x$est.gide-qnorm((1+conf.int)/2)*x$se.gide),
+                      "CI.up" = c(x$est.ide+qnorm((1+conf.int)/2)*x$se.ide, 
+                                  x$est.iie+qnorm((1+conf.int)/2)*x$se.iie, 
                                   x$est.oe+qnorm((1+conf.int)/2)*x$se.oe,
-                                  x$est.pm+qnorm((1+conf.int)/2)*x$se.pm))
-    rownames(out) <- c("sde", "sie", "oe", "pm")
+                                  x$est.gide+qnorm((1+conf.int)/2)*x$se.gide))
+    rownames(out) <- c("ide", "iie", "oe", "gide")
   }
   if(type=="OR"){
     x <- obj$est.OR
-    out <- data.frame("est" = c(x$est.ORsde, x$est.ORsie, x$est.ORoe),
-                      "se" = c(x$se.ORsde, x$se.ORsie, x$se.ORoe),
-                      "CI.low" = c(x$est.ORsde-qnorm((1+conf.int)/2)*x$se.ORsde, 
-                                   x$est.ORsie-qnorm((1+conf.int)/2)*x$se.ORsie, 
-                                   x$est.ORoe-qnorm((1+conf.int)/2)*x$se.ORoe),
-                      "CI.up" = c(x$est.ORsde+qnorm((1+conf.int)/2)*x$se.ORsde, 
-                                  x$est.ORsie+qnorm((1+conf.int)/2)*x$se.ORsie, 
-                                  x$est.ORoe+qnorm((1+conf.int)/2)*x$se.ORoe))
-    rownames(out) <- c("OR_sde", "OR_sie", "OR_oe")
-  }
-  if(type=="logOR"){
-    x <- obj$est.logOR
-    out <- data.frame("est" = c(x$est.logORsde, x$est.logORsie, x$est.logORoe, x$est.logORpm),
-                      "se" = c(x$se.ORsde, x$se.ORsie, x$se.ORoe, x$se.logORpm),
-                      "CI.low" = c(x$est.logORsde-qnorm((1+conf.int)/2)*x$se.logORsde, 
-                                   x$est.logORsie-qnorm((1+conf.int)/2)*x$se.logORsie, 
-                                   x$est.logORoe-qnorm((1+conf.int)/2)*x$se.logORoe,
-                                   x$est.logORpm-qnorm((1+conf.int)/2)*x$se.logORpm),
-                      "CI.up" = c(x$est.logORsde+qnorm((1+conf.int)/2)*x$se.logORsde, 
-                                  x$est.logORsie+qnorm((1+conf.int)/2)*x$se.logORsie, 
-                                  x$est.logORoe+qnorm((1+conf.int)/2)*x$se.logORoe,
-                                  x$est.logORpm+qnorm((1+conf.int)/2)*x$se.logORpm))
-    rownames(out) <- c("logOR_sde", "logOR_sie", "logOR_oe", "logOR_pm")
+    out <- data.frame("est" = c(x$est.ORide, x$est.ORiie, x$est.ORoe, x$est.ORgide),
+                      "se" = c(x$se.ORide, x$se.ORiie, x$se.ORoe, x$se.ORgide),
+                      "CI.low" = c(x$est.ORide-qnorm((1+conf.int)/2)*x$se.ORide, 
+                                   x$est.ORiie-qnorm((1+conf.int)/2)*x$se.ORiie, 
+                                   x$est.ORoe-qnorm((1+conf.int)/2)*x$se.ORoe,
+                                   x$est.ORgide-qnorm((1+conf.int)/2)*x$se.ORgide),
+                      "CI.up" = c(x$est.ORide+qnorm((1+conf.int)/2)*x$se.ORide, 
+                                  x$est.ORiie+qnorm((1+conf.int)/2)*x$se.ORiie, 
+                                  x$est.ORoe+qnorm((1+conf.int)/2)*x$se.ORoe,
+                                  x$est.ORgide+qnorm((1+conf.int)/2)*x$se.ORgide))
+    rownames(out) <- c("OR_ide", "OR_iie", "OR_oe", "OR_gide")
   }
   if(type=="psi"){
     x <- obj$est.psi
@@ -59,5 +45,4 @@ summary.fitLTMLE <- function(obj, type="diff", conf.int=0.95){
   }
   return(out)
 }
-
-
+#-------------------------------------------------------------------------------

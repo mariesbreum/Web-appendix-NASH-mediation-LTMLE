@@ -39,21 +39,21 @@ for(f in list.files("functions",".R$",full.names=TRUE)){source(f)}
 To illustrate how the implementation works we generate a simulated data set from the data generating mechanism (ii) described in the manuscript. 
 ```{r echo = TRUE, eval = TRUE}
 set.seed(67394)
-setting_ii <- list(betaL1.A=0.75, betaM1.A=0.75, betaL2.A=1.00,betaM2.A=1.00,
-                        betaY.A=0.75, betaY.M=0.20, betaY.AL=0.0, betaY.L=-0.15, alphaY=-1)
+setting_ii <- data.frame(betaL1.A=-0.25, betaM1.A=-3.50, betaL2.A=-0.15,betaM2.A=-0.70, 
+                         betaL3.A=-0.10, betaM3.A=-0.25, betaL2.M=0.02, betaL3.M=0.01,
+                         betaY.A=0.90, betaY.M=-0.40, betaY.L=-1.00)
 data <- do.call(simulateData, c(list(n=500), setting_ii))
 ```
 
 The estimates are computed using the <tt>`fitLTMLE`</tt> function 
 ```{r echo = TRUE, eval = TRUE}
-fit <- fitLTMLE(data = data, L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
-                Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                RYmodel = "RY ~ A + M2 + L2", 
-                Ymodel = "Y ~ A + M2 + L2", 
-                QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+fit <- fitLTMLE(data = data, L0nodes = c("L01", "L02"), Anode = "A", Cnodes = c("C1", "C2", "C3"),
+                Lnodes = c("L1", "L2", "L3"), Mnodes = c("M1", "M2", "M3"), RYnode = "RY", Ynode = "Y", 
+                Cmodel= list("C1 ~ A", "C2 ~ A + M1", "C3 ~ A + M2"), 
+                Mmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                gmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                RYmodel= "RY ~ A + M3 + L3", Ymodel="Y ~ A + M3 + L3", 
+                QLmodel= list("QL1 ~ L01 + A", "QL2 ~  A + L1 + M1", "QL3 ~ A + L2 + M2"),
                 a1 = 1, a0 = 0)
 ```
 
@@ -77,15 +77,15 @@ lrn_sl <- Lrnr_sl$new(
 
 We use this learner to estimate the nuisance models $Q_Y$, $p_{R_Y}$, $Q_L$ and $p_C$ by specifying the <tt>`Ylearner`</tt>, <tt>`RYlearner`</tt>,<tt>`QLlearner`</tt>  and <tt>`Clearner`</tt> arguments as follows
 ```{r echo = TRUE, eval = TRUE}
-fitSL <- fitLTMLE(data, L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                  Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
-                  Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                  gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                  RYmodel = "RY ~ A + M2 + L2", 
-                  Ymodel = "Y ~ A + M2 + L2", 
-                  QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                  a1 = 1, a0 = 0, Ylearner = lrn_sl, RYlearner = lrn_sl, QLlearner=lrn_sl, Clearner = lrn_sl)
+fitSL <- fitLTMLE(data, L0nodes = c("L01", "L02"), Anode = "A", Cnodes = c("C1", "C2", "C3"),
+                Lnodes = c("L1", "L2", "L3"), Mnodes = c("M1", "M2", "M3"), RYnode = "RY", Ynode = "Y", 
+                Cmodel= list("C1 ~ A", "C2 ~ A + M1", "C3 ~ A + M2"), 
+                Mmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                gmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                RYmodel= "RY ~ A + M3 + L3", Ymodel="Y ~ A + M3 + L3", 
+                QLmodel= list("QL1 ~ L01 + A", "QL2 ~  A + L1 + M1", "QL3 ~ A + L2 + M2"),
+                a1 = 1, a0 = 0, Ylearner = lrn_sl, RYlearner = lrn_sl, QLlearner = lrn_sl, 
+                Clearner = lrn_sl)
 ```
 
 ```{r echo = TRUE, eval = TRUE}
@@ -96,49 +96,16 @@ summary(fitSL, type="diff")
 summary(fitSL, type="OR")
 ```
 
+
+
 ## Simulation studies <a name="simulations"></a>
-Our simulations studies are organized with the help of the R package [<tt>`targets`</tt>](https://books.ropensci.org/targets/). The simulation set-up is defined in the master file ./_targets.R. The results can be assessed by the function <tt>`tar_read()`</tt> as shown below.
 
-```{r eval=FALSE, include=FALSE}
-sim1 <- targets::tar_read(sim1)
-setDT(sim1)
-sim1[, .(n=mean(n), est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe)), est.pm=mean(est.pm)), by=tar_group]
-```
-
-```{r eval=FALSE, include=FALSE}
-sim1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
-```
-
-```{r eval=FALSE, include=FALSE}
-sim2 <- targets::tar_read(sim2)
-setDT(sim2)
-sim2[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=.(n, mis)]
-```
-
-```{r eval=FALSE, include=FALSE}
-sim2[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))),  by=.(n, mis)]
-```
-
-```{r eval=FALSE, include=FALSE}
-sim3 <- targets::tar_read(sim3)
-setDT(sim3)
-sim3[, .(n=mean(n),est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=tar_group]
-```
-
-```{r eval=FALSE, include=FALSE}
-sim3[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=tar_group]
-```
-
-```{r eval=FALSE, include=FALSE}
-tableD1 <- targets::tar_read(sim_bins)
-setDT(tableD1)
-tableD1[, .(est.psi00=mean(est.psi00), bias.psi00 = mean(est.psi00-psi00.true), sd.psi00=sd(est.psi00), se.psi00=mean(se.psi00), cov.psi00 = mean((psi00.true < est.psi00 + qnorm(0.975)*se.psi00) & (psi00.true > est.psi00 - qnorm(0.975)*se.psi00)), est.psi11=mean(est.psi11), bias.psi11 = mean(est.psi11-psi11.true), sd.psi11=sd(est.psi11), se.psi11=mean(se.psi11), cov.psi11 = mean((psi11.true < est.psi11 + qnorm(0.975)*se.psi11) & (psi11.true > est.psi11 - qnorm(0.975)*se.psi11)), est.psi10=mean(est.psi10), bias.psi10 = mean(est.psi10-psi10.true), sd.psi10=sd(est.psi10), se.psi10=mean(se.psi10), cov.psi10 = mean((psi10.true < est.psi10 + qnorm(0.975)*se.psi10) & (psi10.true > est.psi10 - qnorm(0.975)*se.psi10))), by=.(n, n_bins)]
-```
-
-```{r eval=FALSE, include=FALSE}
-tableD1[, .(est.sde=mean(est.sde), bias.sde = mean(est.sde-sde.true), sd.sde=sd(est.sde), se.sde=mean(se.sde), cov.sde = mean((sde.true < est.sde + qnorm(0.975)*se.sde) & (sde.true > est.sde - qnorm(0.975)*se.sde)), est.sie=mean(est.sie), bias.sie = mean(est.sie-sie.true), sd.sie=sd(est.sie), se.sie=mean(se.sie), cov.sie = mean((sie.true < est.sie + qnorm(0.975)*se.sie) & (sie.true > est.sie - qnorm(0.975)*se.sie)), est.oe=mean(est.oe), bias.oe = mean(est.oe-oe.true), sd.oe=sd(est.oe), se.oe=mean(se.oe), cov.oe = mean((oe.true < est.oe + qnorm(0.975)*se.oe) & (oe.true > est.oe - qnorm(0.975)*se.oe))), by=.(n, n_bins)]
-```
-
-```{r eval=FALSE, include=FALSE}
-tableD1[, .(n=mean(n), est.sde=mean(est.ORsde), bias.sde = mean(est.ORsde-sde.OR.true), sd.sde=sd(est.ORsde), se.sde=mean(se.ORsde), cov.sde = mean((sde.OR.true < est.ORsde + qnorm(0.975)*se.ORsde) & (sde.OR.true > est.ORsde - qnorm(0.975)*se.ORsde)), est.sie=mean(est.ORsie), bias.sie = mean(est.ORsie-sie.OR.true), sd.sie=sd(est.ORsie), se.sie=mean(se.ORsie), cov.sie = mean((sie.OR.true < est.ORsie + qnorm(0.975)*se.ORsie) & (sie.OR.true > est.ORsie - qnorm(0.975)*se.ORsie)), est.oe=mean(est.ORoe), bias.oe = mean(est.ORoe-oe.OR.true), sd.oe=sd(est.ORoe), se.oe=mean(se.ORoe), cov.oe = mean((oe.OR.true < est.ORoe + qnorm(0.975)*se.ORoe) & (oe.OR.true > est.ORoe - qnorm(0.975)*se.ORoe))), by=.(n, n_bins)]
+The simulations can be replicated using the script run-sim.R as shown below
+```{r eval=FALSE, include=TRUE}
+source("settings/simulation_settings.R")
+n <- 400 # sample size
+setting <- setting_ii # data generating mechanism
+formula <- formula_correct_ii # model formulas 
+name <- "sim1-settingII" # name of output 
+source("run-sim.R")
 ```

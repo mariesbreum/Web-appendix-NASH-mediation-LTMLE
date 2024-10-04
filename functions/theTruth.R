@@ -1,72 +1,145 @@
 # -----------------------------------------------------------------------------
-# theTruth
+# theTruth.R
 # -----------------------------------------------------------------------------
-# Description:
-# This function computes the true value of the SDE and SIE. 
-#
+# 
 theTruth <- function(n,
-                     betaL1.A=0.75, 
-                     betaM1.A=0.75, 
-                     betaL2.A=1.00,
-                     betaM2.A=1.00,
-                     betaY.A=0.75, 
-                     betaY.M=0.20, 
-                     betaY.AL=0.0, 
-                     betaY.L=-0.15,
-                     alphaY=-1, 
-                     fitg=NULL
+                     betaL1.A, 
+                     betaM1.A, 
+                     betaL2.A,
+                     betaM2.A,
+                     betaL3.A,
+                     betaM3.A,
+                     betaL2.M,
+                     betaL3.M,
+                     betaY.A, 
+                     betaY.M, 
+                     betaY.L,
+                     fitg,
+                     pi=0.5
 ){
   
-  if(is.null(fitg)){
-    coefM1 = c(2.3, betaM1.A, -0.2)
-    coefM2 = c(0.5, 0.9, betaM2.A, -0.2)
-    sdM1 = 1
-    sdM2 = 1
-  }
-  else{
-    coefM1 = fitg[[1]]$coefficients 
-    coefM2 = fitg[[2]]$coefficients
-    sdM1 = sd(fitg[[1]]$residuals) 
-    sdM2 = sd(fitg[[2]]$residuals) 
-  }
-    
-  L01 <- rnorm(n, mean = 4, sd = 1)
-  L1.a1 <- rnorm(n, mean = 0.5 + 0.85*L01 + betaL1.A*1 , sd = 1)
-  L1.a0 <- rnorm(n, mean = 0.5 + 0.85*L01 + betaL1.A*0 , sd = 1)
-  M1.a1.a1 <- rnorm(n, mean = coefM1[1] + coefM1[2]*1  + coefM1[3]*L1.a1 , sd = sdM1)
-  M1.a1.a0 <- rnorm(n, mean = coefM1[1] + coefM1[2]*0  + coefM1[3]*L1.a1 , sd = sdM1)
-  M1.a0.a0 <- rnorm(n, mean = coefM1[1] + coefM1[2]*0  + coefM1[3]*L1.a0 , sd = sdM1)
-  L2.a1.a1 <- rnorm(n, mean = 0.5 + 0.1*L01+ 0.75*L1.a1 + betaL2.A*1 + 0.2*M1.a1.a1, sd = 1)
-  L2.a1.a0 <- rnorm(n, mean = 0.5 + 0.1*L01+ 0.75*L1.a1 + betaL2.A*1 + 0.2*M1.a1.a0, sd = 1)
-  L2.a0.a0 <- rnorm(n, mean = 0.5 + 0.1*L01+ 0.75*L1.a0 + betaL2.A*0 + 0.2*M1.a0.a0, sd = 1)
-  M2.a1.a1 <- rnorm(n, mean = coefM2[1] + coefM2[2]*M1.a1.a1 + coefM2[3]*1 +coefM2[4]*L2.a1.a1, sd = sdM2)
-  M2.a1.a0 <- rnorm(n, mean = coefM2[1] + coefM2[2]*M1.a1.a0 + coefM2[3]*0 +coefM2[4]*L2.a1.a0, sd = sdM2)
-  M2.a0.a0 <- rnorm(n, mean = coefM2[1] + coefM2[2]*M1.a0.a0 + coefM2[3]*0 +coefM2[4]*L2.a0.a0, sd = sdM2)
-  Y.a1.a1 <- rbinom(n, 1, plogis(alphaY + betaY.A*1 + betaY.M*M2.a1.a1 + betaY.AL*1*L2.a1.a1 + betaY.L*L2.a1.a1))
-  Y.a1.a0 <- rbinom(n, 1, plogis(alphaY + betaY.A*1 + betaY.M*M2.a1.a0 + betaY.AL*1*L2.a1.a0 + betaY.L*L2.a1.a0))
-  Y.a0.a0 <- rbinom(n, 1, plogis(alphaY + betaY.A*0 + betaY.M*M2.a0.a0 + betaY.AL*0*L2.a0.a0 + betaY.L*L2.a0.a0))
-
-  psi11.0 <- mean(Y.a1.a1)
-  psi10.0 <- mean(Y.a1.a0)
-  psi00.0 <- mean(Y.a0.a0)
-  sde.0 <- psi10.0-psi00.0
-  sie.0 <- psi11.0-psi10.0
-  oe.0 <- psi11.0-psi00.0
-  pm.0 <- sde.0/oe.0
-
-  sde.OR.0 <- (psi10.0/(1-psi10.0)) / (psi00.0/(1-psi00.0))
-  sie.OR.0 <- (psi11.0/(1-psi11.0)) / (psi10.0/(1-psi10.0))
-  oe.OR.0  <- (psi11.0/(1-psi11.0)) / (psi00.0/(1-psi00.0))
-  sde.logOR.0 <- log(sde.OR.0)
-  sie.logOR.0 <- log(sie.OR.0)
-  oe.logOR.0 <- log(oe.OR.0)
-  pm.logOR.0 <- sde.logOR.0/oe.logOR.0
+  L01 <- rnorm(n, mean = 4, sd = 0.5)
+  L02 <- rnorm(n, mean = 100, sd = 20)
   
-  return(data.frame(psi11.true=psi11.0, psi10.true=psi10.0, psi00.true = psi00.0,
-                    sde.true = sde.0, sie.true = sie.0, oe.true = oe.0, 
-                    pm.true = pm.0,
-                    sde.OR.true = sde.OR.0, sie.OR.true = sie.OR.0, 
-                    oe.OR.true = oe.OR.0, sde.logOR.true = sde.logOR.0, sie.logOR.true = sie.logOR.0, 
-                    oe.logOR.true = oe.logOR.0, pm.logOR.true=pm.logOR.0))
+  L1.a1 <- rnorm(n, mean = 1.0 + 0.70*L01 + betaL1.A*1 , sd = 0.4)
+  L1.a0 <- rnorm(n, mean = 1.0 + 0.70*L01 + betaL1.A*0 , sd = 0.4)
+  
+  M1.a1.ga1 <- rnorm(n, mean = predict(fitg[[1]], newdata = data.frame(A=as.factor(rep(1,n)), L1=L1.a1, L02=L02)), 
+                     sd = sd(fitg[[1]]$residuals))
+  M1.a1.ga0 <- rnorm(n, mean = predict(fitg[[1]], newdata = data.frame(A=as.factor(rep(0,n)), L1=L1.a1, L02=L02)), 
+                     sd = sd(fitg[[1]]$residuals))
+  M1.a0.ga0 <- rnorm(n, mean =predict(fitg[[1]], newdata = data.frame(A=as.factor(rep(0,n)), L1=L1.a0, L02=L02)), 
+                     sd = sd(fitg[[1]]$residuals))
+  M1.a0.ga1 <- rnorm(n, mean = predict(fitg[[1]], newdata = data.frame(A=as.factor(rep(1,n)), L1=L1.a0, L02=L02)), 
+                     sd = sd(fitg[[1]]$residuals))
+  
+  L2.a1.ga1 <- rnorm(n, mean = 0.7 + betaL2.A*1 + 0.80*L1.a1 + betaL2.M*M1.a1.ga1, sd = 0.4)
+  L2.a1.ga0 <- rnorm(n, mean = 0.7 + betaL2.A*1 + 0.80*L1.a1 + betaL2.M*M1.a1.ga0, sd = 0.4)
+  L2.a0.ga0 <- rnorm(n, mean = 0.7 + betaL2.A*0 + 0.80*L1.a0 + betaL2.M*M1.a0.ga0, sd = 0.4)
+  L2.a0.ga1 <- rnorm(n, mean = 0.7 + betaL2.A*0 + 0.80*L1.a0 + betaL2.M*M1.a0.ga1, sd = 0.4)
+  
+  M2.a1.g1a0.g2a0 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(0,n)), M1=M1.a1.ga0, L2=L2.a1.ga0)),
+                           sd = sd(fitg[[2]]$residuals))
+  M2.a1.g1a0.g2a1 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(1,n)), M1=M1.a1.ga0, L2=L2.a1.ga0)),
+                           sd = sd(fitg[[2]]$residuals))
+  M2.a1.g1a1.g2a0 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(0,n)), M1=M1.a1.ga1, L2=L2.a1.ga1)),
+                           sd = sd(fitg[[2]]$residuals))
+  M2.a1.g1a1.g2a1 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(1,n)), M1=M1.a1.ga1, L2=L2.a1.ga1)),
+                     sd = sd(fitg[[2]]$residuals))
+  M2.a0.g1a0.g2a0 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(0,n)), M1=M1.a0.ga0, L2=L2.a0.ga0)),
+                     sd = sd(fitg[[2]]$residuals))
+  M2.a0.g1a0.g2a1 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(1,n)), M1=M1.a0.ga0, L2=L2.a0.ga0)),
+                           sd = sd(fitg[[2]]$residuals))
+  M2.a0.g1a1.g2a0 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(0,n)), M1=M1.a0.ga1, L2=L2.a0.ga1)),
+                     sd = sd(fitg[[2]]$residuals))
+  M2.a0.g1a1.g2a1 <- rnorm(n, mean = predict(fitg[[2]], newdata = data.frame(A=as.factor(rep(1,n)), M1=M1.a0.ga1, L2=L2.a0.ga1)),
+                         sd = sd(fitg[[2]]$residuals))
+  
+  L3.a1.g1a0.g2a0 <- rnorm(n, mean = 0.9 + betaL3.A*1 + 0.75*L2.a1.ga0 + betaL3.M*M2.a1.g1a0.g2a0, sd = 0.4)
+  L3.a1.g1a0.g2a1 <- rnorm(n, mean = 0.9 + betaL3.A*1 + 0.75*L2.a1.ga0 + betaL3.M*M2.a1.g1a0.g2a1, sd = 0.4)
+  L3.a1.g1a1.g2a0 <- rnorm(n, mean = 0.9 + betaL3.A*1 + 0.75*L2.a1.ga1 + betaL3.M*M2.a1.g1a1.g2a0, sd = 0.4)
+  L3.a1.g1a1.g2a1 <- rnorm(n, mean = 0.9 + betaL3.A*1 + 0.75*L2.a1.ga1 + betaL3.M*M2.a1.g1a1.g2a1, sd = 0.4)
+  L3.a0.g1a0.g2a0 <- rnorm(n, mean = 0.9 + betaL3.A*0 + 0.75*L2.a0.ga0 + betaL3.M*M2.a0.g1a0.g2a0, sd = 0.4)
+  L3.a0.g1a0.g2a1 <- rnorm(n, mean = 0.9 + betaL3.A*0 + 0.75*L2.a0.ga0 + betaL3.M*M2.a0.g1a0.g2a1, sd = 0.4)
+  L3.a0.g1a1.g2a0 <- rnorm(n, mean = 0.9 + betaL3.A*0 + 0.75*L2.a0.ga1 + betaL3.M*M2.a0.g1a1.g2a0, sd = 0.4)
+  L3.a0.g1a1.g2a1 <- rnorm(n, mean = 0.9 + betaL3.A*0 + 0.75*L2.a0.ga1 + betaL3.M*M2.a0.g1a1.g2a1, sd = 0.4)
+  
+  
+  
+  M3.a1.g1a0.g2a0.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a1.g1a0.g2a0, L3=L3.a1.g1a0.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a1.g1a0.g2a0.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a1.g1a0.g2a0, L3=L3.a1.g1a0.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a1.g1a0.g2a1.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a1.g1a0.g2a1, L3=L3.a1.g1a0.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a1.g1a0.g2a1.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a1.g1a0.g2a1, L3=L3.a1.g1a0.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a1.g1a1.g2a0.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a1.g1a1.g2a0, L3=L3.a1.g1a1.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a1.g1a1.g2a0.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a1.g1a1.g2a0, L3=L3.a1.g1a1.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a1.g1a1.g2a1.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a1.g1a1.g2a1, L3=L3.a1.g1a1.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a1.g1a1.g2a1.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a1.g1a1.g2a1, L3=L3.a1.g1a1.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a0.g2a0.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a0.g1a0.g2a0, L3=L3.a0.g1a0.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a0.g2a0.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a0.g1a0.g2a0, L3=L3.a0.g1a0.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a0.g2a1.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a0.g1a0.g2a1, L3=L3.a0.g1a0.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a0.g2a1.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a0.g1a0.g2a1, L3=L3.a0.g1a0.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a1.g2a0.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a0.g1a1.g2a0, L3=L3.a0.g1a1.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a1.g2a0.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a0.g1a1.g2a0, L3=L3.a0.g1a1.g2a0)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a1.g2a1.g3a0 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(0,n)), M2=M2.a0.g1a1.g2a1, L3=L3.a0.g1a1.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  M3.a0.g1a1.g2a1.g3a1 <- rnorm(n, mean = predict(fitg[[3]], newdata = data.frame(A=as.factor(rep(1,n)), M2=M2.a0.g1a1.g2a1, L3=L3.a0.g1a1.g2a1)),
+                                sd = sd(fitg[[3]]$residuals))
+  
+  Y.a1.g1a0.g2a0.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a0.g2a0.g3a0 + betaY.L*L3.a1.g1a0.g2a0))
+  Y.a1.g1a0.g2a0.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a0.g2a0.g3a1 + betaY.L*L3.a1.g1a0.g2a0))
+  Y.a1.g1a0.g2a1.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a0.g2a1.g3a0 + betaY.L*L3.a1.g1a0.g2a1))
+  Y.a1.g1a0.g2a1.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a0.g2a1.g3a1 + betaY.L*L3.a1.g1a0.g2a1))
+  Y.a1.g1a1.g2a0.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a1.g2a0.g3a0 + betaY.L*L3.a1.g1a1.g2a0))
+  Y.a1.g1a1.g2a0.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a1.g2a0.g3a1 + betaY.L*L3.a1.g1a1.g2a0))
+  Y.a1.g1a1.g2a1.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a1.g2a1.g3a0 + betaY.L*L3.a1.g1a1.g2a1))
+  Y.a1.g1a1.g2a1.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*1 + betaY.M*M3.a1.g1a1.g2a1.g3a1 + betaY.L*L3.a1.g1a1.g2a1))
+  Y.a0.g1a0.g2a0.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a0.g2a0.g3a0 + betaY.L*L3.a0.g1a0.g2a0))
+  Y.a0.g1a0.g2a0.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a0.g2a0.g3a1 + betaY.L*L3.a0.g1a0.g2a0))
+  Y.a0.g1a0.g2a1.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a0.g2a1.g3a0 + betaY.L*L3.a0.g1a0.g2a1))
+  Y.a0.g1a0.g2a1.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a0.g2a1.g3a1 + betaY.L*L3.a0.g1a0.g2a1))
+  Y.a0.g1a1.g2a0.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a1.g2a0.g3a0 + betaY.L*L3.a0.g1a1.g2a0))
+  Y.a0.g1a1.g2a0.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a1.g2a0.g3a1 + betaY.L*L3.a0.g1a1.g2a0))
+  Y.a0.g1a1.g2a1.g3a0 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a1.g2a1.g3a0 + betaY.L*L3.a0.g1a1.g2a1))
+  Y.a0.g1a1.g2a1.g3a1 <- rbinom(n, 1, plogis(3.0 + betaY.A*0 + betaY.M*M3.a0.g1a1.g2a1.g3a1 + betaY.L*L3.a0.g1a1.g2a1))
+  
+  
+  psi11 <- mean(Y.a1.g1a1.g2a1.g3a1)
+  psi10 <- mean(Y.a1.g1a0.g2a0.g3a0)
+  psi00 <- mean(Y.a0.g1a0.g2a0.g3a0)
+  psi1g <- pi^3*mean(Y.a1.g1a1.g2a1.g3a1) +  pi^3*mean(Y.a1.g1a0.g2a1.g3a1) + pi^3*mean(Y.a1.g1a1.g2a0.g3a1) + pi^3*mean(Y.a1.g1a1.g2a1.g3a0)+ 
+    pi^3*mean(Y.a1.g1a0.g2a0.g3a1) +  pi^3*mean(Y.a1.g1a1.g2a0.g3a0) + pi^3*mean(Y.a1.g1a0.g2a1.g3a0) + pi^3*mean(Y.a1.g1a0.g2a0.g3a0)
+  psi0g <- pi^3*mean(Y.a0.g1a1.g2a1.g3a1) +  pi^3*mean(Y.a0.g1a0.g2a1.g3a1) + pi^3*mean(Y.a0.g1a1.g2a0.g3a1) + pi^3*mean(Y.a0.g1a1.g2a1.g3a0)+ 
+    pi^3*mean(Y.a0.g1a0.g2a0.g3a1) +  pi^3*mean(Y.a0.g1a1.g2a0.g3a0) + pi^3*mean(Y.a0.g1a0.g2a1.g3a0) + pi^3*mean(Y.a0.g1a0.g2a0.g3a0)
+  
+  ide <- psi10-psi00
+  iie <- psi11-psi10
+  oe <- psi11-psi00
+  pm <- ide/oe
+  gide <- psi1g-psi0g
+  
+  ide.OR <- (psi10/(1-psi10)) / (psi00/(1-psi00))
+  iie.OR <- (psi11/(1-psi11)) / (psi10/(1-psi10))
+  oe.OR  <- (psi11/(1-psi11)) / (psi00/(1-psi00))
+  gide.OR  <- (psi1g/(1-psi1g)) / (psi0g/(1-psi0g))
+  
+  return(data.frame(psi11.true=psi11, psi10.true=psi10, psi00.true = psi00, psi1g.true=psi1g, 
+                    psi0g.true = psi0g, ide.true = ide, iie.true = iie, oe.true = oe, pm.true = pm,
+                    gide.true = gide, ide.OR.true = ide.OR, iie.OR.true = iie.OR, oe.OR.true = oe.OR,
+                    gide.OR.true = gide.OR))
 }
 
+#-------------------------------------------------------------------------------

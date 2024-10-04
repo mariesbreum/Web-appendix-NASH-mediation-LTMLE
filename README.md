@@ -34,40 +34,41 @@ set from the data generating mechanism (ii) described in the manuscript.
 
 ``` r
 set.seed(67394)
-setting_ii <- list(betaL1.A=0.75, betaM1.A=0.75, betaL2.A=1.00,betaM2.A=1.00,
-                        betaY.A=0.75, betaY.M=0.20, betaY.AL=0.0, betaY.L=-0.15, alphaY=-1)
+setting_ii <- data.frame(betaL1.A=-0.25, betaM1.A=-3.50, betaL2.A=-0.15,betaM2.A=-0.70, 
+                         betaL3.A=-0.10, betaM3.A=-0.25, betaL2.M=0.02, betaL3.M=0.01,
+                         betaY.A=0.90, betaY.M=-0.40, betaY.L=-1.00)
 data <- do.call(simulateData, c(list(n=500), setting_ii))
 ```
 
 The estimates are computed using the <tt>`fitLTMLE`</tt> function
 
 ``` r
-fit <- fitLTMLE(data = data, L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
-                Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                RYmodel = "RY ~ A + M2 + L2", 
-                Ymodel = "Y ~ A + M2 + L2", 
-                QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
+fit <- fitLTMLE(data = data, L0nodes = c("L01", "L02"), Anode = "A", Cnodes = c("C1", "C2", "C3"),
+                Lnodes = c("L1", "L2", "L3"), Mnodes = c("M1", "M2", "M3"), RYnode = "RY", Ynode = "Y", 
+                Cmodel= list("C1 ~ A", "C2 ~ A + M1", "C3 ~ A + M2"), 
+                Mmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                gmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                RYmodel= "RY ~ A + M3 + L3", Ymodel="Y ~ A + M3 + L3", 
+                QLmodel= list("QL1 ~ L01 + A", "QL2 ~  A + L1 + M1", "QL3 ~ A + L2 + M2"),
                 a1 = 1, a0 = 0)
 ```
 
 ``` r
 summary(fit, type="diff", conf.int=0.95)
-#>            est         se      CI.low     CI.up
-#> sde 0.10629133 0.05169714 0.004966801 0.2076158
-#> sie 0.07490711 0.03098414 0.014179306 0.1356349
-#> oe  0.18119844 0.04411706 0.094730579 0.2676663
-#> pm  0.41339822 0.19085926 0.039320937 0.7874755
+#>            est         se     CI.low     CI.up
+#> ide  0.1829425 0.05208074 0.08086612 0.2850189
+#> iie  0.1736942 0.03516035 0.10478118 0.2426072
+#> oe   0.3566367 0.02939299 0.29902751 0.4142459
+#> gide 0.1386958 0.03698031 0.06621576 0.2111759
 ```
 
 ``` r
 summary(fit, type="OR", conf.int=0.95)
-#>             est        se    CI.low    CI.up
-#> OR_sde 1.830818 0.5221452 0.8074320 2.854204
-#> OR_sie 1.410378 0.2130413 0.9928253 1.827932
-#> OR_oe  2.582146 0.6202299 1.3665177 3.797774
+#>              est        se   CI.low    CI.up
+#> OR_ide  2.136964 0.4929529 1.170794 3.103134
+#> OR_iie  2.649498 0.3754110 1.913706 3.385290
+#> OR_oe   5.661884 0.9686233 3.763417 7.560350
+#> OR_gide 1.931106 0.3698143 1.206283 2.655929
 ```
 
 ### Data adaptive estimation <a name="dataadaptive"></a>
@@ -90,38 +91,45 @@ $Q_L$ and $p_C$ by specifying the <tt>`Ylearner`</tt>,
 arguments as follows
 
 ``` r
-fitSL <- fitLTMLE(data, L0nodes = c("L01"), Anode = "A", Cnodes = c("C1", "C2"),
-                  Lnodes = c("L1", "L2"), Mnodes = c("M1", "M2"), RYnode = "RY", Ynode = "Y", 
-                  Cmodel = list("C1 ~ A", "C2 ~ A + M1"), 
-                  Mmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"),
-                  gmodel = list("M1 ~ A + L1", "M2 ~ M1 + A + L2"), 
-                  RYmodel = "RY ~ A + M2 + L2", 
-                  Ymodel = "Y ~ A + M2 + L2", 
-                  QLmodel = list("QL1 ~ L01 + A", "QL2 ~ L01 + L1 + A + M1"),
-                  a1 = 1, a0 = 0, Ylearner = lrn_sl, RYlearner = lrn_sl, QLlearner=lrn_sl, Clearner = lrn_sl)
+fitSL <- fitLTMLE(data, L0nodes = c("L01", "L02"), Anode = "A", Cnodes = c("C1", "C2", "C3"),
+                Lnodes = c("L1", "L2", "L3"), Mnodes = c("M1", "M2", "M3"), RYnode = "RY", Ynode = "Y", 
+                Cmodel= list("C1 ~ A", "C2 ~ A + M1", "C3 ~ A + M2"), 
+                Mmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                gmodel=list("M1 ~ A + L1 + L02", "M2 ~ A + M1 + L2", "M3 ~ A + M2 + L3"),
+                RYmodel= "RY ~ A + M3 + L3", Ymodel="Y ~ A + M3 + L3", 
+                QLmodel= list("QL1 ~ L01 + A", "QL2 ~  A + L1 + M1", "QL3 ~ A + L2 + M2"),
+                a1 = 1, a0 = 0, Ylearner = lrn_sl, RYlearner = lrn_sl, QLlearner = lrn_sl, 
+                Clearner = lrn_sl)
 ```
 
 ``` r
 summary(fitSL, type="diff")
-#>            est         se      CI.low     CI.up
-#> sde 0.10685153 0.05131292 0.006280045 0.2074230
-#> sie 0.07339888 0.03080795 0.013016401 0.1337813
-#> oe  0.18025040 0.04425957 0.093503233 0.2669976
-#> pm  0.40720506 0.18911190 0.036552547 0.7778576
+#>            est         se     CI.low     CI.up
+#> ide  0.1966504 0.05112400 0.09644915 0.2968516
+#> iie  0.1706980 0.03403765 0.10398546 0.2374106
+#> oe   0.3673484 0.02869136 0.31111435 0.4235824
+#> gide 0.1589278 0.03603440 0.08830172 0.2295540
 ```
 
 ``` r
 summary(fitSL, type="OR")
-#>             est        se    CI.low    CI.up
-#> OR_sde 1.832229 0.5175435 0.8178628 2.846596
-#> OR_sie 1.399929 0.2090297 0.9902382 1.809619
-#> OR_oe  2.564991 0.6157912 1.3580621 3.771919
+#>              est        se   CI.low    CI.up
+#> OR_ide  2.276042 0.5251564 1.246755 3.305330
+#> OR_iie  2.711702 0.3679149 1.990602 3.432801
+#> OR_oe   6.171947 1.0540403 4.106066 8.237828
+#> OR_gide 2.142963 0.4114196 1.336595 2.949330
 ```
 
 ## Simulation studies <a name="simulations"></a>
 
-Our simulations studies are organized with the help of the R package
-[<tt>`targets`</tt>](https://books.ropensci.org/targets/). The
-simulation set-up is defined in the master file ./\_targets.R. The
-results can be assessed by the function <tt>`tar_read()`</tt> as shown
-below.
+The simulations can be replicated using the script run-sim.R as shown
+below
+
+``` r
+source("settings/simulation_settings.R")
+n <- 400 # sample size
+setting <- setting_ii # data generating mechanism
+formula <- formula_correct_ii # model formulas 
+name <- "sim1-settingII" # name of output 
+source("run-sim.R")
+```
